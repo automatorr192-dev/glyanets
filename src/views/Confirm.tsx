@@ -54,7 +54,7 @@ export function Confirm({ draft, set, now, onSubmit, isTop }: Props) {
 
       <Group head="Автомобиль" i={2} foot="Номер нужен охране на въезде.">
         <div className="field">
-          <label htmlFor="car">Марка и модель</label>
+          <label htmlFor="car">Машина</label>
           <input id="car" value={draft.car} onChange={e => set({ car: e.target.value })} placeholder="Kia K5" autoComplete="off" />
         </div>
         <div className="field">

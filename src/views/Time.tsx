@@ -28,15 +28,17 @@ export function Time({ draft, set, bookings, now, onNext, isTop }: Props) {
   const haptic = useHaptic()
   const hours = quote(draft.services, draft.cls).hours
   const day = dayAt(draft.day, now)
-  const taken = bookings
-    .filter(b => status(b, now) !== 'cancelled' && sameDay(new Date(b.start), day))
-    .map(b => hm(new Date(b.start)))
+  const takenOn = (d: Date) =>
+    bookings.filter(b => status(b, now) !== 'cancelled' && sameDay(new Date(b.start), d)).map(b => hm(new Date(b.start)))
+  const taken = takenOn(day)
   const slots = useMemo(() => slotsFor(day, hours, taken, new Date(now)), [day.getTime(), hours, taken.join(), now])
   const days = useMemo(() => Array.from({ length: 14 }, (_, i) => dayAt(i, now)), [now])
+  const today = days[0]
+  const todayFull = !slotsFor(today, hours, takenOn(today), new Date(now)).some(s => s.free)
 
   useEffect(() => {
-    if (draft.day === 0 && !slots.some(s => s.free)) set({ day: 1, time: null })
-  }, [draft.day, slots])
+    if (draft.day === 0 && todayFull) set({ day: 1, time: null })
+  }, [draft.day, todayFull])
 
   const ready = draft.time ? readyAt(startOf(draft, now), hours) : null
 
@@ -53,13 +55,14 @@ export function Time({ draft, set, bookings, now, onNext, isTop }: Props) {
             type="button"
             className={`day${d.getDay() === 0 || d.getDay() === 6 ? ' weekend' : ''}`}
             aria-pressed={i === draft.day}
-            aria-label={relDay(d, new Date(now))}
+            aria-label={i === 0 && todayFull ? 'Сегодня, мест нет' : relDay(d, new Date(now))}
+            disabled={i === 0 && todayFull}
             onClick={() => {
               haptic.select()
               set({ day: i, time: null })
             }}
           >
-            <small>{i === 0 ? 'сег' : weekday(d)}</small>
+            <small>{i === 0 ? 'сегодня' : weekday(d)}</small>
             <b>{d.getDate()}</b>
           </button>
         ))}
@@ -71,7 +74,9 @@ export function Time({ draft, set, bookings, now, onNext, isTop }: Props) {
         foot={
           ready
             ? `Заберёте ${relDay(ready, new Date(now))} после ${hm(ready)}.`
-            : hours >= 6
+            : todayFull && draft.day === 1
+              ? 'На сегодня свободного времени уже нет, ближайшее — завтра.'
+              : hours >= 6
               ? 'Долгие работы начинаем утром, машина остаётся у нас.'
               : 'Зачёркнутое время уже занято.'
         }

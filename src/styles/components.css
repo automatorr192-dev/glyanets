@@ -1,41 +1,10 @@
-.ring {
-  position: relative;
-  display: inline-grid;
-  place-items: center;
-  flex: none;
-}
-
-.ring svg {
-  position: absolute;
-  inset: 0;
-}
-
-.ring-label {
-  position: relative;
-  display: flex;
-  align-items: baseline;
-  font-variant-numeric: tabular-nums;
-}
-
-.ring-label b {
-  font-family: var(--font-display);
-  font-size: 21px;
-  font-weight: 700;
-  letter-spacing: -.03em;
-}
-
-.ring-label small {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--label-2);
-}
-
 /* --- Live Activity ---------------------------------------------------------- */
 
 .live {
   display: block;
   width: calc(100% - 2 * var(--gutter));
-  margin: 14px var(--gutter) 0;
+  max-width: calc(480px - 2 * var(--gutter));
+  margin: 14px auto 0;
   padding: 16px 16px 14px;
   border: 0;
   border-radius: 22px;
@@ -47,14 +16,6 @@
   transition: transform .2s var(--snap);
 }
 
-@media (min-width: 512px) {
-  .live {
-    margin-left: auto;
-    margin-right: auto;
-    width: calc(480px - 2 * var(--gutter));
-  }
-}
-
 button.live:active {
   transform: scale(.98);
 }
@@ -63,6 +24,17 @@ button.live:active {
   display: flex;
   align-items: center;
   gap: 14px;
+}
+
+.live-icon {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  background: var(--tint-soft);
+  color: var(--tint);
 }
 
 .live-text {
@@ -167,6 +139,7 @@ button.live:active {
   gap: 8px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--gutter);
   padding: 4px var(--gutter) 6px;
   scrollbar-width: none;
 }
@@ -221,6 +194,10 @@ button.live:active {
 
 .day.weekend[aria-pressed='true'] small {
   color: inherit;
+}
+
+.day:disabled {
+  opacity: .35;
 }
 
 .slots {
@@ -449,7 +426,7 @@ button.live:active {
   border-radius: 22px;
   overflow: hidden;
   aspect-ratio: 16 / 10;
-  background: var(--cell);
+  background: var(--cell-2);
 }
 
 .hero-photo img {
@@ -491,11 +468,14 @@ button.live:active {
 
 .web-back {
   position: fixed;
-  top: 6px;
+  top: 0;
   left: 8px;
   z-index: 8;
-  height: 32px;
-  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 44px;
+  padding: 0 12px 0 4px;
   border: 0;
   border-radius: 999px;
   background: transparent;

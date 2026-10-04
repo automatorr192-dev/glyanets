@@ -32,6 +32,7 @@
   --material: rgba(30, 30, 34, .72);
   --material-line: rgba(255, 255, 255, .08);
   --shadow: 0 10px 30px rgba(0, 0, 0, .45);
+  --desk: #161619;
 }
 
 [data-theme='light'] {
@@ -51,4 +52,5 @@
   --material: rgba(249, 249, 251, .78);
   --material-line: rgba(0, 0, 0, .07);
   --shadow: 0 10px 30px rgba(17, 17, 20, .12);
+  --desk: #e2e2e7;
 }

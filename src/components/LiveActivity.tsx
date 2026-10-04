@@ -1,7 +1,7 @@
+import { Car } from '@phosphor-icons/react'
 import { byId, STAGES } from '../lib/data'
 import { hm, relDay } from '../lib/format'
 import { progress, type Booking } from '../lib/store'
-import { Ring } from './ui'
 
 export function stagesOf(b: Booking) {
   return b.services.flatMap(id => STAGES[id].map(stage => ({ service: byId(id).name, stage })))
@@ -17,13 +17,12 @@ export function LiveActivity({ booking, now, onOpen }: { booking: Booking; now: 
   return (
     <Tag type={onOpen ? 'button' : undefined} className="live inner rise" onClick={onOpen} aria-label={`В работе: ${booking.car}, ${Math.round(p * 100)} процентов`}>
       <div className="live-top">
-        <Ring value={p} size={68} stroke={7}>
-          <b>{Math.round(p * 100)}</b>
-          <small>%</small>
-        </Ring>
+        <span className="live-icon" aria-hidden="true">
+          <Car size={26} weight="fill" />
+        </span>
         <div className="live-text">
           <span className="live-state">
-            <i aria-hidden="true" /> В работе
+            <i aria-hidden="true" /> В работе · {Math.round(p * 100)}%
           </span>
           <b className="live-car">{booking.car}</b>
           <span className="live-step">

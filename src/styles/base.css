@@ -46,6 +46,94 @@ button {
   overflow: hidden;
 }
 
+.web-intro {
+  display: none;
+}
+
+/* --- в браузере на компьютере приложение живёт в рамке телефона ---------------- */
+
+@media (min-width: 720px) and (min-height: 640px) {
+  html:has(.no-tg),
+  .no-tg {
+    background: var(--desk);
+  }
+
+  .no-tg .app {
+    inset: max(24px, calc(50vh - 437px)) auto auto 50%;
+    width: 402px;
+    height: min(874px, calc(100vh - 48px));
+    margin-left: -201px;
+    border-radius: 50px;
+    background: var(--bg);
+    box-shadow: 0 0 0 10px #0d0d0f, 0 0 0 11px rgba(255, 255, 255, .1), 0 40px 90px rgba(0, 0, 0, .45);
+    transform: translateZ(0);
+  }
+}
+
+@media (min-width: 1100px) and (min-height: 640px) {
+  .no-tg .web-intro {
+    display: grid;
+    gap: 14px;
+    position: fixed;
+    top: 50%;
+    right: calc(50% + 201px + 72px);
+    width: 300px;
+    transform: translateY(-50%);
+  }
+
+  .web-intro .wi-kicker {
+    margin: 0;
+    color: var(--tint);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .web-intro .wi-title {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 48px;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -.035em;
+  }
+
+  .web-intro .wi-text {
+    margin: 0;
+    color: var(--label-2);
+    font-size: 17px;
+    line-height: 1.45;
+  }
+
+  .web-intro .wi-qr {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 14px;
+    color: var(--label-2);
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .web-intro .wi-qr svg {
+    flex: none;
+    width: 96px;
+    height: 96px;
+    padding: 8px;
+    border-radius: 14px;
+    background: #fff;
+  }
+
+  .web-intro .wi-credit {
+    margin: 10px 0 0;
+    color: var(--label-2-solid);
+    font-size: 13px;
+  }
+
+  .web-intro a {
+    color: inherit;
+  }
+}
+
 /* --- стек экранов ---------------------------------------------------------- */
 
 .screen {
@@ -397,6 +485,7 @@ a.cell:active {
   color: var(--tint-ink);
   font-size: 17px;
   font-weight: 600;
+  text-decoration: none;
   transition: transform .15s var(--snap), opacity .2s var(--snap);
 }
 
@@ -508,12 +597,15 @@ a.cell:active {
   font-size: 15px;
   font-weight: 500;
   transform: translate(-50%, -150%);
-  transition: transform .45s var(--push);
+  visibility: hidden;
+  transition: transform .45s var(--push), visibility 0s .45s;
   pointer-events: none;
 }
 
 .toast.show {
   transform: translate(-50%, 0);
+  visibility: visible;
+  transition: transform .45s var(--push);
 }
 
 /* --- появление ------------------------------------------------------------------------ */

@@ -1,7 +1,7 @@
 import { Check } from '@phosphor-icons/react'
 import { Cell, Group, NavBar } from '../components/ui'
 import { LiveActivity, stagesOf } from '../components/LiveActivity'
-import { byId, STUDIO } from '../lib/data'
+import { quote, STUDIO } from '../lib/data'
 import { dayMonth, hm, relDay, rub, weekday } from '../lib/format'
 import { progress, status, type Booking } from '../lib/store'
 import { STATUS_RU } from './Bookings'
@@ -12,6 +12,7 @@ export function Detail({ booking, now, onCancel }: Props) {
   const s = status(booking, now)
   const start = new Date(booking.start), ready = new Date(booking.ready)
   const stages = stagesOf(booking)
+  const q = quote(booking.services, booking.cls)
   const current = s === 'in_work' ? Math.min(stages.length - 1, Math.floor(progress(booking, now) * stages.length)) : s === 'done' ? stages.length : -1
 
   return (
@@ -53,9 +54,10 @@ export function Detail({ booking, now, onCancel }: Props) {
       <Group head="Детали" i={2}>
         <Cell title="Автомобиль" value={booking.car} />
         {booking.plate && <Cell title="Госномер" value={booking.plate} />}
-        {booking.services.map(id => (
-          <Cell key={id} title={byId(id).name} />
+        {q.items.map(i => (
+          <Cell key={i.id} title={i.name} value={rub(i.price)} />
         ))}
+        {q.discount > 0 && <Cell title="Скидка за комплекс" value={<span className="discount">−{rub(q.discount)}</span>} />}
         <Cell title={<b>Итого</b>} value={<span className="total">{rub(booking.total)}</span>} />
       </Group>
 

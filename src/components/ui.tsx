@@ -99,36 +99,6 @@ export function BottomAction({ text, onClick, active = true, visible }: { text: 
   )
 }
 
-export function Ring({ value, size = 64, stroke = 7, children }: { value: number; size?: number; stroke?: number; children?: ReactNode }) {
-  const r = (size - stroke) / 2
-  const c = 2 * Math.PI * r
-  const [shown, setShown] = useState(0)
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setShown(value))
-    return () => cancelAnimationFrame(id)
-  }, [value])
-  return (
-    <span className="ring" style={{ width: size, height: size }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--cell-2)" strokeWidth={stroke} />
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          fill="none"
-          stroke="var(--tint)"
-          strokeWidth={stroke}
-          strokeLinecap="round"
-          strokeDasharray={c}
-          strokeDashoffset={c * (1 - shown)}
-          style={{ transform: 'rotate(-90deg)', transformOrigin: 'center', transition: 'stroke-dashoffset 1.4s var(--ease)' }}
-        />
-      </svg>
-      <span className="ring-label">{children}</span>
-    </span>
-  )
-}
-
 export function Toast({ text }: { text: string | null }) {
   return (
     <div className={`toast${text ? ' show' : ''}`} role="status" aria-live="polite">

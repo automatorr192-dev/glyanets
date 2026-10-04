@@ -1,4 +1,4 @@
-import { CalendarCheck, Sparkle, Storefront } from '@phosphor-icons/react'
+import { CalendarCheck, CaretLeft, Sparkle, Storefront } from '@phosphor-icons/react'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Toast } from './components/ui'
 import { useBackButton } from './hooks/useBackButton'
@@ -217,7 +217,8 @@ export default function App() {
 
       {!TG && stack.length > 1 && (
         <button className="web-back" type="button" onClick={pop} aria-label="Назад">
-          ‹ Назад
+          <CaretLeft size={22} weight="bold" />
+          Назад
         </button>
       )}
       <Toast text={toast} />
