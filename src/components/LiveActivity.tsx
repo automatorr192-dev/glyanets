@@ -1,0 +1,46 @@
+import { byId, STAGES } from '../lib/data'
+import { hm, relDay } from '../lib/format'
+import { progress, type Booking } from '../lib/store'
+import { Ring } from './ui'
+
+export function stagesOf(b: Booking) {
+  return b.services.flatMap(id => STAGES[id].map(stage => ({ service: byId(id).name, stage })))
+}
+
+export function LiveActivity({ booking, now, onOpen }: { booking: Booking; now: number; onOpen?: () => void }) {
+  const p = progress(booking, now)
+  const stages = stagesOf(booking)
+  const current = Math.min(stages.length - 1, Math.floor(p * stages.length))
+  const ready = new Date(booking.ready)
+  const Tag = onOpen ? 'button' : 'div'
+
+  return (
+    <Tag type={onOpen ? 'button' : undefined} className="live inner rise" onClick={onOpen} aria-label={`В работе: ${booking.car}, ${Math.round(p * 100)} процентов`}>
+      <div className="live-top">
+        <Ring value={p} size={68} stroke={7}>
+          <b>{Math.round(p * 100)}</b>
+          <small>%</small>
+        </Ring>
+        <div className="live-text">
+          <span className="live-state">
+            <i aria-hidden="true" /> В работе
+          </span>
+          <b className="live-car">{booking.car}</b>
+          <span className="live-step">
+            {stages[current].service}: {stages[current].stage.toLowerCase()}
+          </span>
+        </div>
+        <div className="live-eta">
+          <small>Готово</small>
+          <b>{hm(ready)}</b>
+          <small>{relDay(ready, new Date(now))}</small>
+        </div>
+      </div>
+      <ol className="live-steps" aria-hidden="true">
+        {stages.map((_, i) => (
+          <li key={i} className={i < current ? 'done' : i === current ? 'now' : ''} />
+        ))}
+      </ol>
+    </Tag>
+  )
+}

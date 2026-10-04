@@ -1,0 +1,54 @@
+:root {
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --snap: cubic-bezier(.2, .8, .2, 1);
+  --push: cubic-bezier(.32, .72, 0, 1);
+
+  --r-group: 16px;
+  --r-tile: 9px;
+  --gutter: 16px;
+  --tab-h: 62px;
+  --tg-top: 0px;
+  --tg-bottom: 0px;
+}
+
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #08080a;
+  --cell: #1c1c1f;
+  --cell-2: #2b2b30;
+  --sep: rgba(84, 84, 88, .55);
+  --label: #f5f5f7;
+  --label-2: rgba(235, 235, 245, .62);
+  --label-2-solid: #9a9aa1;
+  --tint: #5ad1ff;
+  --tint-ink: #031620;
+  --tint-soft: rgba(90, 209, 255, .14);
+  --ok: #30d158;
+  --danger: #ff6961;
+  --material: rgba(30, 30, 34, .72);
+  --material-line: rgba(255, 255, 255, .08);
+  --shadow: 0 10px 30px rgba(0, 0, 0, .45);
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f2f2f7;
+  --cell: #ffffff;
+  --cell-2: #e8e8ed;
+  --sep: rgba(60, 60, 67, .22);
+  --label: #111114;
+  --label-2: rgba(60, 60, 67, .78);
+  --label-2-solid: #6c6c72;
+  --tint: #0a78ad;
+  --tint-ink: #ffffff;
+  --tint-soft: rgba(10, 120, 173, .1);
+  --ok: #1f9d47;
+  --danger: #d70015;
+  --material: rgba(249, 249, 251, .78);
+  --material-line: rgba(0, 0, 0, .07);
+  --shadow: 0 10px 30px rgba(17, 17, 20, .12);
+}
