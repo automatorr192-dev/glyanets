@@ -25,7 +25,7 @@ export function Detail({ booking, now, onCancel }: Props) {
         <Group i={0}>
           <Cell
             title={<b style={{ fontSize: 20 }}>{`${dayMonth(start)}, ${weekday(start)}`}</b>}
-            sub={s === 'upcoming' ? `Приём в ${hm(start)}, готово ${relDay(ready, new Date(now))} к ${hm(ready)}` : `Приём был в ${hm(start)}`}
+            sub={s === 'upcoming' ? `Приём в ${hm(start)}, готово ${relDay(ready, new Date(now))} к ${hm(ready)}` : `Приём был в ${hm(start)}`}
             value={<span className={`chip ${s}`}>{STATUS_RU[s]}</span>}
           />
         </Group>

@@ -1,5 +1,5 @@
 import { BottomAction, Cell, Group, NavBar, Segmented } from '../components/ui'
-import { CLASSES, quote, SERVICES, type ServiceId } from '../lib/data'
+import { CLASSES, quote, SERVICES, type ServiceId, inOrder } from '../lib/data'
 import { duration, rub } from '../lib/format'
 import { useHaptic } from '../hooks/useHaptic'
 import { ICON } from './Home'
@@ -12,7 +12,7 @@ export function Book({ draft, set, onNext, isTop }: Props) {
   const q = quote(draft.services, draft.cls)
   const toggle = (id: ServiceId) => {
     haptic.select()
-    set({ services: draft.services.includes(id) ? draft.services.filter(s => s !== id) : [...draft.services, id] })
+    set({ services: draft.services.includes(id) ? draft.services.filter(s => s !== id) : inOrder([...draft.services, id]) })
   }
 
   return (

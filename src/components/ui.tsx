@@ -9,7 +9,9 @@ export function NavBar({ title, large, sub, right }: { title: string; large?: bo
 
   useEffect(() => {
     if (!large || !sentinel.current) return
-    const io = new IntersectionObserver(([e]) => setCompact(!e.isIntersecting), { threshold: 0, rootMargin: '-44px 0px 0px 0px' })
+    const root = sentinel.current.closest('.screen')
+    const top = 44 + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tg-top')) || 0)
+    const io = new IntersectionObserver(([e]) => setCompact(!e.isIntersecting), { root, threshold: 0, rootMargin: `-${top}px 0px 0px 0px` })
     io.observe(sentinel.current)
     return () => io.disconnect()
   }, [large])
@@ -23,8 +25,8 @@ export function NavBar({ title, large, sub, right }: { title: string; large?: bo
       {large ? (
         <div className="large inner">
           <h1>{title}</h1>
-          {sub && <p>{sub}</p>}
           <div ref={sentinel} style={{ height: 1 }} />
+          {sub && <p>{sub}</p>}
         </div>
       ) : (
         <div style={{ height: 52 }} />

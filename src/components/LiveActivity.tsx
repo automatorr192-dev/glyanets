@@ -1,10 +1,10 @@
 import { Car } from '@phosphor-icons/react'
-import { byId, STAGES } from '../lib/data'
+import { byId, inOrder, STAGES } from '../lib/data'
 import { hm, relDay } from '../lib/format'
 import { progress, type Booking } from '../lib/store'
 
 export function stagesOf(b: Booking) {
-  return b.services.flatMap(id => STAGES[id].map(stage => ({ service: byId(id).name, stage })))
+  return inOrder(b.services).flatMap(id => STAGES[id].map(stage => ({ service: byId(id).name, stage })))
 }
 
 export function LiveActivity({ booking, now, onOpen }: { booking: Booking; now: number; onOpen?: () => void }) {

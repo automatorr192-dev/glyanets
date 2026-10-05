@@ -40,7 +40,7 @@ export function Confirm({ draft, set, now, onSubmit, isTop }: Props) {
         <Cell
           icon={<CalendarBlank size={19} weight="fill" />}
           title={`${relDay(start, new Date(now))[0].toUpperCase() + relDay(start, new Date(now)).slice(1)}, ${draft.time}`}
-          sub={`Готово ${relDay(ready, new Date(now))} к ${hm(ready)}`}
+          sub={`Готово ${relDay(ready, new Date(now))} к ${hm(ready)}`}
         />
       </Group>
 
@@ -55,11 +55,11 @@ export function Confirm({ draft, set, now, onSubmit, isTop }: Props) {
       <Group head="Автомобиль" i={2} foot="Номер нужен охране на въезде.">
         <div className="field">
           <label htmlFor="car">Машина</label>
-          <input id="car" value={draft.car} onChange={e => set({ car: e.target.value })} placeholder="Kia K5" autoComplete="off" />
+          <input id="car" value={draft.car} onChange={e => set({ car: e.target.value })} placeholder="Марка и модель" autoComplete="off" />
         </div>
         <div className="field">
           <label htmlFor="plate">Госномер</label>
-          <input id="plate" value={draft.plate} onChange={e => set({ plate: e.target.value.toUpperCase() })} placeholder="А 000 АА 777" autoComplete="off" />
+          <input id="plate" value={draft.plate} onChange={e => set({ plate: e.target.value.toUpperCase() })} placeholder="Госномер" autoComplete="off" />
         </div>
       </Group>
 

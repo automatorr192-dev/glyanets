@@ -2,7 +2,7 @@ import { Armchair, CalendarCheck, Drop, Percent, Shield, ShieldCheck, Sparkle } 
 import type { ReactNode } from 'react'
 import { Cell, Group, NavBar } from '../components/ui'
 import { LiveActivity } from '../components/LiveActivity'
-import { quote, SERVICES, type ServiceId, byId } from '../lib/data'
+import { quote, SERVICES, type ServiceId, byId, inOrder } from '../lib/data'
 import { duration, hm, relDay, rub } from '../lib/format'
 import { status, type Booking } from '../lib/store'
 import { userName } from '../lib/tg'
@@ -35,7 +35,7 @@ export function Home({ bookings, now, onBook, onOpen }: Props) {
           <Cell
             icon={<CalendarCheck size={19} weight="fill" />}
             title={`Ждём вас ${relDay(new Date(next.start), new Date(now))} в ${hm(new Date(next.start))}`}
-            sub={next.services.map(id => byId(id).name).join(', ')}
+            sub={inOrder(next.services).map(id => byId(id).name).join(', ')}
             chevron
             onClick={() => onOpen(next.id)}
           />

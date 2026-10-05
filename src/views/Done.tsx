@@ -1,5 +1,5 @@
 import { Cell, Group } from '../components/ui'
-import { byId } from '../lib/data'
+import { quote } from '../lib/data'
 import { hm, relDay, rub } from '../lib/format'
 import type { Booking } from '../lib/store'
 
@@ -7,6 +7,7 @@ type Props = { booking: Booking; now: number; onBookings: () => void; onHome: ()
 
 export function Done({ booking, now, onBookings, onHome }: Props) {
   const start = new Date(booking.start)
+  const q = quote(booking.services, booking.cls)
   return (
     <>
       <div className="done-hero inner">
@@ -16,14 +17,15 @@ export function Done({ booking, now, onBookings, onHome }: Props) {
         </svg>
         <h1>Вы записаны</h1>
         <p>
-          Ждём {booking.car} {relDay(start, new Date(now))} в {hm(start)}. Запись уже во вкладке «Записи».
+          Ждём {booking.car} {relDay(start, new Date(now))} в {hm(start)}. Запись уже во вкладке «Записи».
         </p>
       </div>
 
       <Group i={2}>
-        {booking.services.map(id => (
-          <Cell key={id} title={byId(id).name} />
+        {q.items.map(i => (
+          <Cell key={i.id} title={i.name} value={rub(i.price)} />
         ))}
+        {q.discount > 0 && <Cell title="Скидка за комплекс" value={<span className="discount">−{rub(q.discount)}</span>} />}
         <Cell title={<b>Итого</b>} value={<span className="total">{rub(booking.total)}</span>} />
       </Group>
 

@@ -109,7 +109,8 @@ export default function App() {
     setStack([entry(r)])
   }
 
-  useBackButton(pop, stack.length > 1)
+  const canBack = stack.length > 1 && stack[stack.length - 1].name !== 'done'
+  useBackButton(pop, canBack)
 
   const startBooking = (ids: ServiceId[] = []) => {
     set({ services: ids, time: null })
@@ -215,7 +216,7 @@ export default function App() {
         ))}
       </nav>
 
-      {!TG && stack.length > 1 && (
+      {!TG && canBack && (
         <button className="web-back" type="button" onClick={pop} aria-label="Назад">
           <CaretLeft size={22} weight="bold" />
           Назад

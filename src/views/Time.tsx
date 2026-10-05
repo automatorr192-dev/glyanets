@@ -73,9 +73,9 @@ export function Time({ draft, set, bookings, now, onNext, isTop }: Props) {
         i={2}
         foot={
           ready
-            ? `Заберёте ${relDay(ready, new Date(now))} после ${hm(ready)}.`
+            ? `Заберёте ${relDay(ready, new Date(now))} после ${hm(ready)}.`
             : todayFull && draft.day === 1
-              ? 'На сегодня свободного времени уже нет, ближайшее — завтра.'
+              ? 'На сегодня свободного времени уже нет, ближайшее — завтра.'
               : hours >= 6
               ? 'Долгие работы начинаем утром, машина остаётся у нас.'
               : 'Зачёркнутое время уже занято.'

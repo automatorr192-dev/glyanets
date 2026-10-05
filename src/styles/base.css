@@ -46,7 +46,8 @@ button {
   overflow: hidden;
 }
 
-.web-intro {
+.web-intro,
+.device {
   display: none;
 }
 
@@ -56,27 +57,84 @@ button {
   html:has(.no-tg),
   .no-tg {
     background: var(--desk);
+    --px: 50vw;
+    --fh: min(852px, calc(100vh - 96px));
+    --ft: calc((100vh - var(--fh)) / 2);
+  }
+
+  .device {
+    display: block;
+    position: fixed;
+    z-index: 0;
+    top: var(--ft);
+    left: calc(var(--px) - 201px);
+    width: 402px;
+    height: var(--fh);
+    border-radius: 54px;
+    background: var(--bg);
+    box-shadow: 0 0 0 11px #111114, 0 0 0 12px rgba(255, 255, 255, .14), 0 50px 100px -20px rgba(0, 0, 0, .5);
+  }
+
+  .device::before {
+    content: '';
+    position: absolute;
+    top: 11px;
+    left: 50%;
+    width: 122px;
+    height: 35px;
+    margin-left: -61px;
+    border-radius: 20px;
+    background: #000;
+  }
+
+  .device .sb-time {
+    position: absolute;
+    top: 18px;
+    left: 44px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -.01em;
+  }
+
+  .device svg {
+    position: absolute;
+    top: 21px;
+    right: 30px;
+    width: 72px;
+    height: 13px;
+    fill: currentColor;
   }
 
   .no-tg .app {
-    inset: max(24px, calc(50vh - 437px)) auto auto 50%;
+    inset: calc(var(--ft) + 50px) auto auto calc(var(--px) - 201px);
     width: 402px;
-    height: min(874px, calc(100vh - 48px));
-    margin-left: -201px;
-    border-radius: 50px;
-    background: var(--bg);
-    box-shadow: 0 0 0 10px #0d0d0f, 0 0 0 11px rgba(255, 255, 255, .1), 0 40px 90px rgba(0, 0, 0, .45);
+    height: calc(var(--fh) - 50px);
+    border-radius: 0 0 54px 54px;
+    background: transparent;
     transform: translateZ(0);
+  }
+
+  .no-tg .screen {
+    scrollbar-width: none;
+  }
+
+  .no-tg .screen::-webkit-scrollbar {
+    display: none;
   }
 }
 
 @media (min-width: 1100px) and (min-height: 640px) {
+  html:has(.no-tg),
+  .no-tg {
+    --px: calc(50vw + 186px);
+  }
+
   .no-tg .web-intro {
     display: grid;
     gap: 14px;
     position: fixed;
     top: 50%;
-    right: calc(50% + 201px + 72px);
+    right: calc(100vw - var(--px) + 201px + 72px);
     width: 300px;
     transform: translateY(-50%);
   }

@@ -61,10 +61,13 @@ export const SERVICES: Service[] = [
 
 export const byId = (id: ServiceId) => SERVICES.find(s => s.id === id)!
 
+const ORDER: ServiceId[] = ['wash', 'interior', 'polish', 'ppf', 'ceramic']
+export const inOrder = (ids: ServiceId[]) => [...ids].sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b))
+
 export const BUNDLE_OFF = 0.1
 
 export function quote(ids: ServiceId[], cls: CarClass) {
-  const items = ids.map(id => ({ id, name: byId(id).name, price: byId(id).price[cls] }))
+  const items = inOrder(ids).map(id => ({ id, name: byId(id).name, price: byId(id).price[cls] }))
   const subtotal = items.reduce((a, b) => a + b.price, 0)
   const bundle = ids.includes('polish') && ids.includes('ceramic')
   const discount = bundle ? Math.round((byId('polish').price[cls] + byId('ceramic').price[cls]) * BUNDLE_OFF / 100) * 100 : 0

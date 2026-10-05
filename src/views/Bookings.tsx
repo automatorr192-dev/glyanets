@@ -1,7 +1,7 @@
 import { CalendarPlus, CaretRight } from '@phosphor-icons/react'
 import { useState } from 'react'
 import { Group, NavBar, Segmented } from '../components/ui'
-import { byId } from '../lib/data'
+import { byId, inOrder } from '../lib/data'
 import { hm } from '../lib/format'
 import { status, type Booking, type Status } from '../lib/store'
 
@@ -50,7 +50,7 @@ export function Bookings({ bookings, now, onOpen, onBook }: Props) {
                   <small>{MON[d.getMonth()]}</small>
                 </span>
                 <span className="body">
-                  <span className="title">{b.services.map(id => byId(id).name).join(', ')}</span>
+                  <span className="title">{inOrder(b.services).map(id => byId(id).name).join(', ')}</span>
                   <span className="sub">
                     {hm(d)}, {b.car}
                   </span>
