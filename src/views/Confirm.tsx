@@ -74,7 +74,7 @@ export function Confirm({ draft, set, now, onSubmit, isTop }: Props) {
       >
         <div className="field">
           <label htmlFor="name">Имя</label>
-          <input id="name" value={draft.name} onChange={e => set({ name: e.target.value })} placeholder="Как к вам обращаться" autoComplete="given-name" />
+          <input id="name" value={draft.name} onChange={e => set({ name: e.target.value })} placeholder="Имя" autoComplete="given-name" />
         </div>
         <div className="field">
           <label htmlFor="phone">Телефон</label>
@@ -84,7 +84,7 @@ export function Confirm({ draft, set, now, onSubmit, isTop }: Props) {
             inputMode="tel"
             value={draft.phone}
             onChange={e => set({ phone: maskPhone(e.target.value) })}
-            placeholder="+7 900 000-00-00"
+            placeholder="+7 999 000 00 00"
             autoComplete="tel"
           />
         </div>
