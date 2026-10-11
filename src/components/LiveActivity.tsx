@@ -1,4 +1,3 @@
-import { Car } from '@phosphor-icons/react'
 import { byId, inOrder, STAGES } from '../lib/data'
 import { hm, relDay } from '../lib/format'
 import { progress, type Booking } from '../lib/store'
@@ -17,12 +16,9 @@ export function LiveActivity({ booking, now, onOpen }: { booking: Booking; now: 
   return (
     <Tag type={onOpen ? 'button' : undefined} className="live inner rise" onClick={onOpen} aria-label={`В работе: ${booking.car}, ${Math.round(p * 100)} процентов`}>
       <div className="live-top">
-        <span className="live-icon" aria-hidden="true">
-          <Car size={26} weight="fill" />
-        </span>
         <div className="live-text">
           <span className="live-state">
-            <i aria-hidden="true" /> В работе · {Math.round(p * 100)}%
+            <i aria-hidden="true" /> В работе, {Math.round(p * 100)}%
           </span>
           <b className="live-car">{booking.car}</b>
           <span className="live-step">

@@ -104,6 +104,15 @@ export default function App() {
     window.setTimeout(() => setGhost(g => (g?.key === top.key ? null : g)), PUSH_MS)
   }
 
+  const popTo = (name: Route['name']) => {
+    const i = stack.findIndex(r => r.name === name)
+    if (i < 0 || i === stack.length - 1) return
+    const top = stack[stack.length - 1]
+    setGhost(top)
+    setStack(s => s.slice(0, i + 1))
+    window.setTimeout(() => setGhost(g => (g?.key === top.key ? null : g)), PUSH_MS)
+  }
+
   const reset = (r: Route) => {
     setGhost(null)
     setStack([entry(r)])
@@ -151,7 +160,16 @@ export default function App() {
   const render = (r: Entry, isTop: boolean) => {
     switch (r.name) {
       case 'home':
-        return <Home bookings={bookings} now={now} onBook={startBooking} onOpen={id => push({ name: 'detail', id })} />
+        return (
+          <Home
+            bookings={bookings}
+            now={now}
+            cls={draft.cls}
+            onClass={cls => set({ cls })}
+            onBook={startBooking}
+            onOpen={id => push({ name: 'detail', id })}
+          />
+        )
       case 'bookings':
         return <Bookings bookings={bookings} now={now} onOpen={id => push({ name: 'detail', id })} onBook={() => startBooking()} />
       case 'studio':
@@ -161,7 +179,17 @@ export default function App() {
       case 'time':
         return <Time draft={draft} set={set} bookings={bookings} now={now} isTop={isTop} onNext={() => push({ name: 'confirm' })} />
       case 'confirm':
-        return <Confirm draft={draft} set={set} now={now} isTop={isTop} onSubmit={submit} />
+        return (
+          <Confirm
+            draft={draft}
+            set={set}
+            now={now}
+            isTop={isTop}
+            onSubmit={submit}
+            onEditTime={() => popTo('time')}
+            onEditServices={() => popTo('book')}
+          />
+        )
       case 'done': {
         const b = find(r.id)
         return b ? <Done booking={b} now={now} onBookings={() => reset({ name: 'bookings' })} onHome={() => reset({ name: 'home' })} /> : null

@@ -1,17 +1,317 @@
-/* --- Live Activity ---------------------------------------------------------- */
+/* --- герой главной ---------------------------------------------------------- */
+
+.hero {
+  position: relative;
+  container-type: inline-size;
+  margin-top: calc(-1 * (var(--tg-top) + env(safe-area-inset-top, 0px)));
+}
+
+.hero-shot {
+  position: relative;
+  margin: 0;
+  height: min(58vh, 430px);
+  overflow: hidden;
+  background: var(--cell);
+}
+
+.hero-shot img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 100% 50%;
+  filter: grayscale(1) contrast(1.15) brightness(.82);
+  animation: develop .9s var(--ease) both;
+}
+
+.hero-shot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 55%, transparent) 0%, transparent 26%, transparent 55%, var(--bg) 100%);
+}
+
+@keyframes develop {
+  from { opacity: 0; transform: scale(1.06); }
+  to { opacity: 1; transform: none; }
+}
+
+.hero-copy {
+  position: relative;
+  margin-top: -138px;
+  padding: 0 var(--gutter);
+}
+
+.hero-kicker {
+  margin: 0;
+  font-size: 11.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--label-2);
+  animation: rise .6s .1s var(--ease) both;
+}
+
+.hero-title {
+  margin: 6px 0 0;
+  color: var(--tint);
+  font-family: var(--font-display);
+  font-size: clamp(56px, 21cqi, 92px);
+  line-height: .9;
+  font-weight: 900;
+  letter-spacing: -.01em;
+  text-transform: uppercase;
+  animation: rise .6s .15s var(--ease) both;
+}
+
+.hero-text {
+  margin: 16px 0 0;
+  max-width: 34ch;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--label-2);
+  text-wrap: pretty;
+  animation: rise .6s .22s var(--ease) both;
+}
+
+.hero-cta {
+  width: auto;
+  margin-top: 22px;
+  animation: rise .6s .28s var(--ease) both;
+}
+
+/* --- кузов ------------------------------------------------------------------------ */
+
+.classes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.class {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  min-height: 84px;
+  padding: 12px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  text-align: left;
+  transition: border-color .2s var(--snap), background-color .2s var(--snap), color .2s var(--snap), transform .15s var(--snap);
+}
+
+.class b {
+  font-family: var(--font-display);
+  font-size: 30px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.class small {
+  font-size: 12px;
+  color: var(--label-2);
+}
+
+.class[aria-pressed='true'] {
+  border-color: var(--tint);
+  background: var(--tint-soft);
+  color: var(--tint);
+}
+
+.class[aria-pressed='true'] small {
+  color: var(--tint);
+}
+
+.class:active {
+  transform: scale(.97);
+}
+
+/* --- услуги ----------------------------------------------------------------------- */
+
+.service {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  column-gap: 16px;
+  row-gap: 6px;
+  width: 100%;
+  padding: 18px 0;
+  border: 0;
+  border-bottom: 1px solid var(--sep);
+  background: transparent;
+  text-align: left;
+  transition: opacity .15s var(--snap);
+}
+
+.service:active {
+  opacity: .6;
+}
+
+.service-name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  line-height: 1.15;
+  font-weight: 700;
+}
+
+.service-price {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--tint);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.service-sub {
+  grid-column: 1 / -1;
+  font-size: 12.5px;
+  color: var(--label-2);
+}
+
+.bundle {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 6px 16px;
+  width: calc(100% - 2 * var(--gutter));
+  max-width: calc(480px - 2 * var(--gutter));
+  margin: 28px auto 0;
+  padding: 18px;
+  border: 1px solid var(--tint);
+  background: var(--tint-soft);
+  text-align: left;
+  transition: transform .15s var(--snap);
+}
+
+.bundle:active {
+  transform: scale(.98);
+}
+
+.bundle-off {
+  grid-row: span 2;
+  font-family: var(--font-display);
+  font-size: 40px;
+  line-height: 1;
+  font-weight: 900;
+  color: var(--tint);
+}
+
+.bundle-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.bundle-price {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bundle-price s {
+  font-size: 12.5px;
+  color: var(--label-2-solid);
+}
+
+.bundle-price b {
+  font-size: 15px;
+}
+
+/* --- шаги записи -------------------------------------------------------------------- */
+
+.steps {
+  padding: 56px var(--gutter) 0;
+}
+
+.steps ol {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.steps li {
+  padding-top: 10px;
+  border-top: 2px solid var(--sep);
+  font-size: 11.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--label-2-solid);
+  transition: border-color .3s var(--snap), color .3s var(--snap);
+}
+
+.steps li.done {
+  border-color: var(--label-2);
+  color: var(--label-2);
+}
+
+.steps li.now {
+  border-color: var(--tint);
+  color: var(--tint);
+}
+
+/* --- сводка ----------------------------------------------------------------------- */
+
+.visit {
+  display: grid;
+  gap: 4px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--sep);
+}
+
+.visit b {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.visit span {
+  font-size: 13px;
+  color: var(--label-2);
+}
+
+.sum {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 18px 0 4px;
+}
+
+.sum span {
+  font-size: 11.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--label-2);
+}
+
+.sum b {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--tint);
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.total {
+  font-weight: 700;
+  color: var(--label);
+}
+
+.discount {
+  color: var(--tint);
+}
+
+/* --- в работе ------------------------------------------------------------------------ */
 
 .live {
   display: block;
   width: calc(100% - 2 * var(--gutter));
   max-width: calc(480px - 2 * var(--gutter));
-  margin: 14px auto 0;
-  padding: 16px 16px 14px;
-  border: 0;
-  border-radius: 22px;
-  background:
-    radial-gradient(120% 140% at 0% 0%, var(--tint-soft), transparent 55%),
-    var(--cell);
-  box-shadow: inset 0 0 0 .5px var(--material-line);
+  margin: 30px auto 0;
+  padding: 18px;
+  border: 1px solid var(--line-strong);
+  background: var(--cell);
   text-align: left;
   transition: transform .2s var(--snap);
 }
@@ -22,34 +322,24 @@ button.live:active {
 
 .live-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
-}
-
-.live-icon {
-  flex: none;
-  width: 52px;
-  height: 52px;
-  border-radius: 15px;
-  display: grid;
-  place-items: center;
-  background: var(--tint-soft);
-  color: var(--tint);
 }
 
 .live-text {
   flex: 1;
   min-width: 0;
   display: grid;
-  gap: 2px;
+  gap: 4px;
 }
 
 .live-state {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12.5px;
-  font-weight: 600;
+  gap: 8px;
+  font-size: 11.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
   color: var(--tint);
 }
 
@@ -57,7 +347,6 @@ button.live:active {
   position: relative;
   width: 7px;
   height: 7px;
-  border-radius: 50%;
   background: var(--tint);
 }
 
@@ -65,7 +354,6 @@ button.live:active {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: 50%;
   background: var(--tint);
   animation: live 2.2s var(--ease) infinite;
 }
@@ -76,13 +364,14 @@ button.live:active {
 }
 
 .live-car {
-  font-size: 19px;
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1.1;
   font-weight: 700;
-  letter-spacing: -.02em;
 }
 
 .live-step {
-  font-size: 14px;
+  font-size: 12.5px;
   color: var(--label-2);
   white-space: nowrap;
   overflow: hidden;
@@ -96,37 +385,61 @@ button.live:active {
 }
 
 .live-eta small {
-  font-size: 12px;
+  font-size: 11.5px;
   color: var(--label-2);
 }
 
 .live-eta b {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 32px;
+  line-height: 1.1;
   font-weight: 700;
-  letter-spacing: -.02em;
+  color: var(--tint);
+  font-variant-numeric: lining-nums;
 }
 
 .live-steps {
-  display: grid;
-  grid-auto-flow: column;
-  gap: 4px;
-  margin: 14px 0 0;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0 2px;
   padding: 0;
   list-style: none;
 }
 
+.live-steps::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--line-strong);
+}
+
 .live-steps li {
-  height: 4px;
-  border-radius: 2px;
-  background: var(--cell-2);
+  position: relative;
+  width: 11px;
+  height: 11px;
+  border: 1px solid var(--line-strong);
+  background: var(--cell);
 }
 
 .live-steps li.done {
-  background: color-mix(in srgb, var(--tint) 55%, var(--cell-2));
+  border-color: var(--tint);
+  background: var(--tint);
 }
 
 .live-steps li.now {
+  border-color: var(--tint);
+  background: var(--cell);
+  box-shadow: 0 0 0 4px var(--tint-soft);
+}
+
+.live-steps li.now::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
   background: var(--tint);
 }
 
@@ -136,7 +449,7 @@ button.live:active {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 58px;
-  gap: 8px;
+  gap: 6px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-padding-inline: var(--gutter);
@@ -150,15 +463,14 @@ button.live:active {
 
 .day {
   scroll-snap-align: start;
-  height: 74px;
-  border: 0;
-  border-radius: 16px;
-  background: var(--cell);
+  height: 76px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
   display: grid;
   align-content: center;
   justify-items: center;
-  gap: 2px;
-  transition: background-color .2s var(--snap), color .2s var(--snap), transform .15s var(--snap);
+  gap: 4px;
+  transition: border-color .2s var(--snap), background-color .2s var(--snap), color .2s var(--snap), transform .15s var(--snap);
 }
 
 .day:active {
@@ -166,56 +478,58 @@ button.live:active {
 }
 
 .day small {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--label-2);
-  text-transform: capitalize;
 }
 
 .day b {
   font-family: var(--font-display);
-  font-size: 22px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 700;
+  font-variant-numeric: lining-nums;
+}
+
+.day.weekend small {
+  color: var(--tint);
 }
 
 .day[aria-pressed='true'] {
+  border-color: var(--tint);
   background: var(--tint);
   color: var(--tint-ink);
 }
 
 .day[aria-pressed='true'] small {
   color: inherit;
-  opacity: .8;
-}
-
-.day.weekend small {
-  color: var(--danger);
-}
-
-.day.weekend[aria-pressed='true'] small {
-  color: inherit;
 }
 
 .day:disabled {
-  opacity: .35;
+  opacity: .3;
 }
 
 .slots {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  padding: 12px;
+  gap: 6px;
+  padding: 16px 0 4px;
 }
 
 .slot {
-  height: 44px;
-  border: 0;
-  border-radius: 12px;
-  background: var(--cell-2);
-  font-size: 16px;
-  font-weight: 500;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  height: 52px;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  font-size: 15px;
   font-variant-numeric: tabular-nums;
-  transition: background-color .2s var(--snap), color .2s var(--snap), transform .15s var(--snap);
+  transition: border-color .2s var(--snap), background-color .2s var(--snap), color .2s var(--snap), transform .15s var(--snap);
+}
+
+.slot small {
+  font-size: 11px;
+  color: var(--label-2-solid);
 }
 
 .slot:active:not(:disabled) {
@@ -223,136 +537,121 @@ button.live:active {
 }
 
 .slot:disabled {
-  background: transparent;
+  border-style: dashed;
+  border-color: var(--sep);
   color: var(--label-2-solid);
-  text-decoration: line-through;
   cursor: default;
 }
 
 .slot[aria-pressed='true'] {
+  border-color: var(--tint);
   background: var(--tint);
   color: var(--tint-ink);
-}
-
-/* --- итог ----------------------------------------------------------------------------- */
-
-.total {
   font-weight: 700;
-  color: var(--label);
-}
-
-.discount {
-  color: var(--ok);
 }
 
 /* --- записи ----------------------------------------------------------------------------- */
 
 .date-tile {
   flex: none;
-  width: 44px;
-  height: 48px;
-  border-radius: 11px;
-  background: var(--cell-2);
+  width: 48px;
   display: grid;
-  align-content: center;
-  justify-items: center;
-  line-height: 1.05;
+  justify-items: start;
+  line-height: 1;
 }
 
 .date-tile b {
   font-family: var(--font-display);
-  font-size: 19px;
+  font-size: 30px;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: lining-nums;
 }
 
 .date-tile small {
+  margin-top: 4px;
   font-size: 11px;
   color: var(--label-2);
 }
 
 .chip {
   flex: none;
-  font-size: 12.5px;
-  font-weight: 600;
-  padding: 4px 9px;
-  border-radius: 999px;
-  background: var(--cell-2);
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border: 1px solid var(--sep);
   color: var(--label-2);
   white-space: nowrap;
 }
 
 .chip.in_work {
-  background: var(--tint-soft);
+  border-color: var(--tint);
   color: var(--tint);
 }
 
 .chip.upcoming {
-  background: var(--cell-2);
+  border-color: var(--line-strong);
   color: var(--label);
 }
 
 .chip.cancelled {
-  color: var(--danger);
+  color: var(--label-2-solid);
+  text-decoration: line-through;
 }
 
 .empty {
-  margin: 48px var(--gutter) 0;
-  text-align: center;
+  margin: 56px var(--gutter) 0;
   display: grid;
-  justify-items: center;
+  justify-items: start;
   gap: 10px;
 }
 
 .empty .tile {
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
+  width: 56px;
+  height: 56px;
   display: grid;
   place-items: center;
-  background: var(--tint-soft);
+  border: 1px solid var(--tint);
   color: var(--tint);
 }
 
 .empty h2 {
-  margin: 6px 0 0;
-  font-size: 20px;
+  margin: 8px 0 0;
+  font-family: var(--font-display);
+  font-size: 26px;
 }
 
 .empty p {
   margin: 0;
   color: var(--label-2);
-  max-width: 28ch;
+  font-size: 13.5px;
+  max-width: 32ch;
 }
 
 .empty .btn {
   width: auto;
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
-/* --- шаги --------------------------------------------------------------------------------- */
+/* --- этапы ------------------------------------------------------------------------------- */
 
 .timeline .cell .tile {
   width: 26px;
   height: 26px;
-  border-radius: 50%;
-  background: var(--cell-2);
+  border-color: var(--line-strong);
   color: var(--label-2);
-}
-
-.timeline .cell.has-icon {
-  --sep-left: 54px;
+  font-size: 12px;
 }
 
 .timeline .done .tile {
+  border-color: var(--tint);
   background: var(--tint);
   color: var(--tint-ink);
 }
 
 .timeline .now .tile {
-  background: var(--tint-soft);
+  border-color: var(--tint);
   color: var(--tint);
-  box-shadow: inset 0 0 0 1.5px var(--tint);
 }
 
 .timeline .pending .title {
@@ -362,32 +661,35 @@ button.live:active {
 /* --- готово --------------------------------------------------------------------------------- */
 
 .done-hero {
-  padding: 72px var(--gutter) 8px;
-  text-align: center;
+  padding: 84px var(--gutter) 8px;
   display: grid;
-  justify-items: center;
-  gap: 12px;
+  justify-items: start;
+  gap: 14px;
 }
 
 .done-hero h1 {
-  margin: 8px 0 0;
+  margin: 10px 0 0;
   font-family: var(--font-display);
-  font-size: 30px;
-  letter-spacing: -.025em;
+  font-size: 44px;
+  line-height: 1;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--tint);
 }
 
 .done-hero p {
   margin: 0;
   color: var(--label-2);
-  max-width: 30ch;
+  font-size: 14px;
+  max-width: 34ch;
 }
 
 .done-mark {
-  width: 88px;
-  height: 88px;
+  width: 72px;
+  height: 72px;
 }
 
-.done-mark circle {
+.done-mark rect {
   fill: var(--tint);
   transform-origin: center;
   animation: done-pop .5s var(--ease) both;
@@ -397,8 +699,7 @@ button.live:active {
   fill: none;
   stroke: var(--tint-ink);
   stroke-width: 6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+  stroke-linecap: square;
   stroke-dasharray: 60;
   stroke-dashoffset: 60;
   animation: done-draw .45s .25s var(--ease) forwards;
@@ -415,18 +716,19 @@ button.live:active {
 
 .actions {
   display: grid;
-  gap: 10px;
-  margin: 24px var(--gutter) 0;
+  gap: 8px;
+  margin: 30px var(--gutter) 0;
 }
 
 /* --- студия ----------------------------------------------------------------------------------- */
 
 .hero-photo {
-  margin: 14px var(--gutter) 0;
-  border-radius: 22px;
+  width: calc(100% - 2 * var(--gutter));
+  max-width: calc(480px - 2 * var(--gutter));
+  margin: 4px auto 0;
   overflow: hidden;
   aspect-ratio: 16 / 10;
-  background: var(--cell-2);
+  background: var(--cell);
 }
 
 .hero-photo img {
@@ -434,36 +736,14 @@ button.live:active {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  filter: grayscale(1) contrast(1.1);
 }
 
 .fineprint {
-  margin: 28px var(--gutter) 0;
-  font-size: 12.5px;
-  color: var(--label-2);
-  text-align: center;
-  line-height: 1.45;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .live-state i::after,
-  .done-mark circle,
-  .done-mark path {
-    animation: none;
-  }
-
-  .done-mark path {
-    stroke-dashoffset: 0;
-  }
-}
-
-.timeline .list > div + div > .cell::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 54px;
-  height: .5px;
-  background: var(--sep);
+  margin: 32px var(--gutter) 0;
+  font-size: 11.5px;
+  color: var(--label-2-solid);
+  line-height: 1.6;
 }
 
 .web-back {
@@ -473,16 +753,34 @@ button.live:active {
   z-index: 8;
   display: flex;
   align-items: center;
-  gap: 2px;
-  height: 44px;
-  padding: 0 12px 0 4px;
+  gap: 4px;
+  height: 48px;
+  padding: 0 12px 0 6px;
   border: 0;
-  border-radius: 999px;
   background: transparent;
-  color: var(--tint);
-  font-size: 17px;
+  color: var(--label);
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
 }
 
 .web-back:active {
   opacity: .5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-shot img,
+  .hero-kicker,
+  .hero-title,
+  .hero-text,
+  .hero-cta,
+  .live-state i::after,
+  .done-mark rect,
+  .done-mark path {
+    animation: none;
+  }
+
+  .done-mark path {
+    stroke-dashoffset: 0;
+  }
 }

@@ -1,6 +1,5 @@
-import { CalendarBlank } from '@phosphor-icons/react'
-import { BottomAction, Cell, Group, NavBar } from '../components/ui'
-import { quote, readyAt } from '../lib/data'
+import { BottomAction, Cell, Group, NavBar, Steps } from '../components/ui'
+import { CLASSES, quote, readyAt } from '../lib/data'
 import { hm, relDay, rub } from '../lib/format'
 import { requestPhone, TG } from '../lib/tg'
 import { useHaptic } from '../hooks/useHaptic'
@@ -16,15 +15,30 @@ export function maskPhone(raw: string) {
   return d ? '+7' + (p[0] ? ' ' + p[0] : '') + (p[1] ? ' ' + p[1] : '') + (p[2] ? '-' + p[2] : '') + (p[3] ? '-' + p[3] : '') : ''
 }
 
-type Props = { draft: Draft; set: (patch: Partial<Draft>) => void; now: number; onSubmit: () => void; isTop: boolean }
+const cap = (s: string) => s[0].toUpperCase() + s.slice(1)
 
-export function Confirm({ draft, set, now, onSubmit, isTop }: Props) {
+type Props = {
+  draft: Draft
+  set: (patch: Partial<Draft>) => void
+  now: number
+  onSubmit: () => void
+  onEditTime: () => void
+  onEditServices: () => void
+  isTop: boolean
+}
+
+export function Confirm({ draft, set, now, onSubmit, onEditTime, onEditServices, isTop }: Props) {
   const haptic = useHaptic()
   const q = quote(draft.services, draft.cls)
   const start = startOf(draft, now)
   const ready = readyAt(start, q.hours)
   const phoneOk = draft.phone.replace(/\D/g, '').length === 11
   const valid = draft.car.trim().length > 1 && phoneOk
+  const edit = (go: () => void) => (
+    <button type="button" className="edit" onClick={() => { haptic.tap(); go() }}>
+      Изменить
+    </button>
+  )
 
   const share = async () => {
     haptic.tap()
@@ -34,22 +48,26 @@ export function Confirm({ draft, set, now, onSubmit, isTop }: Props) {
 
   return (
     <>
-      <NavBar title="Подтверждение" />
+      <NavBar title="Запись" />
+      <Steps at={2} />
 
-      <Group i={0}>
-        <Cell
-          icon={<CalendarBlank size={19} weight="fill" />}
-          title={`${relDay(start, new Date(now))[0].toUpperCase() + relDay(start, new Date(now)).slice(1)}, ${draft.time}`}
-          sub={`Готово ${relDay(ready, new Date(now))} к ${hm(ready)}`}
-        />
+      <Group head="Визит" i={0} action={edit(onEditTime)}>
+        <div className="visit">
+          <b>{cap(relDay(start, new Date(now)))}, {draft.time}</b>
+          <span>Готово {relDay(ready, new Date(now))} к {hm(ready)}</span>
+        </div>
       </Group>
 
-      <Group head="Услуги" i={1}>
+      <Group head="Услуги" i={1} action={edit(onEditServices)}>
+        <Cell title="Кузов" value={CLASSES.find(c => c.id === draft.cls)!.name} />
         {q.items.map(i => (
           <Cell key={i.id} title={i.name} value={rub(i.price)} />
         ))}
         {q.discount > 0 && <Cell title="Скидка за комплекс" value={<span className="discount">−{rub(q.discount)}</span>} />}
-        <Cell title={<b>Итого</b>} value={<span className="total">{rub(q.total)}</span>} />
+        <div className="sum">
+          <span>Итого</span>
+          <b>{rub(q.total)}</b>
+        </div>
       </Group>
 
       <Group head="Автомобиль" i={2} foot="Номер нужен охране на въезде.">
@@ -59,7 +77,7 @@ export function Confirm({ draft, set, now, onSubmit, isTop }: Props) {
         </div>
         <div className="field">
           <label htmlFor="plate">Госномер</label>
-          <input id="plate" value={draft.plate} onChange={e => set({ plate: e.target.value.toUpperCase() })} placeholder="Госномер" autoComplete="off" />
+          <input id="plate" value={draft.plate} onChange={e => set({ plate: e.target.value.toUpperCase() })} placeholder="А 000 АА 777" autoComplete="off" />
         </div>
       </Group>
 
@@ -74,7 +92,7 @@ export function Confirm({ draft, set, now, onSubmit, isTop }: Props) {
       >
         <div className="field">
           <label htmlFor="name">Имя</label>
-          <input id="name" value={draft.name} onChange={e => set({ name: e.target.value })} placeholder="Имя" autoComplete="given-name" />
+          <input id="name" value={draft.name} onChange={e => set({ name: e.target.value })} placeholder="Как к вам обращаться" autoComplete="given-name" />
         </div>
         <div className="field">
           <label htmlFor="phone">Телефон</label>
@@ -84,14 +102,18 @@ export function Confirm({ draft, set, now, onSubmit, isTop }: Props) {
             inputMode="tel"
             value={draft.phone}
             onChange={e => set({ phone: maskPhone(e.target.value) })}
-            placeholder="+7 999 000 00 00"
+            placeholder="+7 999 000-00-00"
             autoComplete="tel"
           />
         </div>
-        {TG && !phoneOk && <Cell title={<span style={{ color: 'var(--tint)' }}>Взять номер из Telegram</span>} onClick={share} />}
+        {TG && !phoneOk && (
+          <button type="button" className="link-row" onClick={share}>
+            Взять номер из Telegram
+          </button>
+        )}
       </Group>
 
-      <BottomAction visible={isTop} active={valid} text={`Записаться · ${rub(q.total)}`} onClick={onSubmit} />
+      <BottomAction visible={isTop} active={valid} text="Записаться" total={q.total} onClick={onSubmit} />
     </>
   )
 }

@@ -15,10 +15,8 @@ try {
 }
 applyTheme()
 applyInsets()
-TG?.onEvent('themeChanged', applyTheme)
 TG?.onEvent('safeAreaChanged', applyInsets)
 TG?.onEvent('contentSafeAreaChanged', applyInsets)
-if (!TG) matchMedia('(prefers-color-scheme: light)').addEventListener('change', applyTheme)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

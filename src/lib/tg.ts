@@ -17,7 +17,6 @@ type Inset = { top: number; bottom: number; left: number; right: number }
 export type WebApp = {
   platform: string
   version: string
-  colorScheme: 'light' | 'dark'
   initDataUnsafe: { user?: { first_name?: string; last_name?: string; photo_url?: string } }
   safeAreaInset?: Inset
   contentSafeAreaInset?: Inset
@@ -53,21 +52,14 @@ export function userName(): string {
   return TG?.initDataUnsafe.user?.first_name || 'Гость'
 }
 
-export function scheme(): 'light' | 'dark' {
-  if (TG) return TG.colorScheme
-  return matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
-}
-
-const BG = { dark: '#08080a', light: '#f2f2f7' }
+const BG = '#0b0b0c'
 
 export function applyTheme() {
-  const s = scheme()
-  document.documentElement.dataset.theme = s
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', BG[s])
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', BG)
   try {
-    TG?.setHeaderColor(BG[s])
-    TG?.setBackgroundColor(BG[s])
-    TG?.setBottomBarColor?.(BG[s])
+    TG?.setHeaderColor(BG)
+    TG?.setBackgroundColor(BG)
+    TG?.setBottomBarColor?.(BG)
   } catch {
     /* старые клиенты Telegram не знают этих методов */
   }

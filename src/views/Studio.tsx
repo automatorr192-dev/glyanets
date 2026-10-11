@@ -8,7 +8,7 @@ export function Studio() {
     <>
       <NavBar title="Студия" large sub="Два бокса, свет 6500 K, подъёмник" />
 
-      <figure className="hero-photo inner rise" style={{ margin: '14px auto 0', maxWidth: 'calc(480px - 32px)', width: 'calc(100% - 32px)' }}>
+      <figure className="hero-photo rise">
         <img src="./studio.webp" alt="Мастер протирает микрофиброй глянцевый чёрный кузов" width="1200" height="750" loading="lazy" decoding="async" />
       </figure>
 

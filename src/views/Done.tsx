@@ -12,7 +12,7 @@ export function Done({ booking, now, onBookings, onHome }: Props) {
     <>
       <div className="done-hero inner">
         <svg className="done-mark" viewBox="0 0 88 88" aria-hidden="true">
-          <circle cx="44" cy="44" r="44" />
+          <rect width="88" height="88" />
           <path d="M27 45l11 11 23-24" />
         </svg>
         <h1>Вы записаны</h1>

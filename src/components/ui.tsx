@@ -2,27 +2,38 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { CaretRight, Check } from '@phosphor-icons/react'
 import { useMainButton } from '../hooks/useMainButton'
 import { useHaptic } from '../hooks/useHaptic'
+import { CLASSES, type CarClass } from '../lib/data'
+import { rub } from '../lib/format'
+import { TG } from '../lib/tg'
 
-export function NavBar({ title, large, sub, right }: { title: string; large?: boolean; sub?: string; right?: ReactNode }) {
+type NavProps = { title: string; large?: boolean; sub?: string; right?: ReactNode; hero?: ReactNode }
+
+export function NavBar({ title, large, sub, right, hero }: NavProps) {
   const sentinel = useRef<HTMLDivElement>(null)
-  const [compact, setCompact] = useState(!large)
+  const tall = large || !!hero
+  const [compact, setCompact] = useState(!tall)
 
   useEffect(() => {
-    if (!large || !sentinel.current) return
+    if (!tall || !sentinel.current) return
     const root = sentinel.current.closest('.screen')
     const top = 44 + (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--tg-top')) || 0)
     const io = new IntersectionObserver(([e]) => setCompact(!e.isIntersecting), { root, threshold: 0, rootMargin: `-${top}px 0px 0px 0px` })
     io.observe(sentinel.current)
     return () => io.disconnect()
-  }, [large])
+  }, [tall])
 
   return (
     <>
       <header className={`navbar${compact ? ' compact' : ''}`}>
-        <span className="small" aria-hidden={large && !compact}>{title}</span>
+        <span className="small" aria-hidden={tall && !compact}>{title}</span>
         {right && <span className="right">{right}</span>}
       </header>
-      {large ? (
+      {hero ? (
+        <>
+          {hero}
+          <div ref={sentinel} style={{ height: 1 }} />
+        </>
+      ) : large ? (
         <div className="large inner">
           <h1>{title}</h1>
           <div ref={sentinel} style={{ height: 1 }} />
@@ -35,10 +46,15 @@ export function NavBar({ title, large, sub, right }: { title: string; large?: bo
   )
 }
 
-export function Group({ head, foot, children, i = 0 }: { head?: string; foot?: ReactNode; children: ReactNode; i?: number }) {
+export function Group({ head, foot, children, i = 0, action }: { head?: string; foot?: ReactNode; children: ReactNode; i?: number; action?: ReactNode }) {
   return (
     <section className="group inner rise" style={{ ['--i' as string]: i }}>
-      {head && <h2 className="group-head">{head}</h2>}
+      {(head || action) && (
+        <div className="group-top">
+          {head && <h2 className="group-head">{head}</h2>}
+          {action}
+        </div>
+      )}
       <div className="list">{children}</div>
       {foot && <p className="group-foot">{foot}</p>}
     </section>
@@ -59,14 +75,14 @@ type CellProps = {
 export function Cell({ icon, title, sub, value, onClick, chevron, checked, href }: CellProps) {
   const inner = (
     <>
+      {checked !== undefined && <span className="check" aria-hidden="true">{checked && <Check size={13} weight="bold" />}</span>}
       {icon && <span className="tile" aria-hidden="true">{icon}</span>}
       <span className="body">
         <span className="title">{title}</span>
         {sub && <span className="sub">{sub}</span>}
       </span>
       {value !== undefined && <span className="value">{value}</span>}
-      {checked !== undefined && <span className="check" aria-hidden="true">{checked && <Check size={14} weight="bold" />}</span>}
-      {chevron && <CaretRight className="chev" size={16} weight="bold" aria-hidden="true" />}
+      {chevron && <CaretRight className="chev" size={14} weight="bold" aria-hidden="true" />}
     </>
   )
   const cls = `cell${icon ? ' has-icon' : ''}`
@@ -76,14 +92,14 @@ export function Cell({ icon, title, sub, value, onClick, chevron, checked, href 
   return <div className={cls}>{inner}</div>
 }
 
-export function Segmented<T extends string>({ items, value, onChange, label }: { items: { id: T; name: string }[]; value: T; onChange: (v: T) => void; label: string }) {
+export function Segmented<T extends string>({ items, value, onChange, label }: { items: { id: T; name: ReactNode; disabled?: boolean }[]; value: T; onChange: (v: T) => void; label: string }) {
   const haptic = useHaptic()
   const idx = Math.max(0, items.findIndex(i => i.id === value))
   return (
     <div className="segmented inner" role="group" aria-label={label}>
-      <span className="thumb" aria-hidden="true" style={{ width: `calc((100% - 4px) / ${items.length})`, transform: `translateX(${idx * 100}%)` }} />
+      <span className="thumb" aria-hidden="true" style={{ width: `calc((100% - 2px) / ${items.length})`, transform: `translateX(${idx * 100}%)` }} />
       {items.map(i => (
-        <button key={i.id} type="button" aria-pressed={i.id === value} onClick={() => { if (i.id !== value) { haptic.select(); onChange(i.id) } }}>
+        <button key={i.id} type="button" disabled={i.disabled} aria-pressed={i.id === value} onClick={() => { if (i.id !== value) { haptic.select(); onChange(i.id) } }}>
           {i.name}
         </button>
       ))}
@@ -91,11 +107,63 @@ export function Segmented<T extends string>({ items, value, onChange, label }: {
   )
 }
 
-export function BottomAction({ text, onClick, active = true, visible }: { text: string; onClick: () => void; active?: boolean; visible: boolean }) {
-  useMainButton({ text, onClick, active, visible })
+const SIZE: Record<CarClass, string> = { sedan: 'S', suv: 'M', large: 'L' }
+
+export function ClassPicker({ value, onChange }: { value: CarClass; onChange: (c: CarClass) => void }) {
+  const haptic = useHaptic()
+  return (
+    <div className="classes" role="group" aria-label="Кузов">
+      {CLASSES.map(c => (
+        <button
+          key={c.id}
+          type="button"
+          aria-pressed={c.id === value}
+          className="class"
+          onClick={() => {
+            if (c.id !== value) {
+              haptic.select()
+              onChange(c.id)
+            }
+          }}
+        >
+          <b>{SIZE[c.id]}</b>
+          <small>{c.name}</small>
+        </button>
+      ))}
+    </div>
+  )
+}
+
+const STEPS = ['Услуги', 'Время', 'Детали']
+
+export function Steps({ at }: { at: number }) {
+  return (
+    <nav className="steps inner" aria-label={`Шаг ${at + 1} из ${STEPS.length}: ${STEPS[at]}`}>
+      <ol>
+        {STEPS.map((s, i) => (
+          <li key={s} className={i < at ? 'done' : i === at ? 'now' : ''} aria-current={i === at ? 'step' : undefined}>
+            {s}
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}
+
+type ActionProps = { text: string; onClick: () => void; active?: boolean; visible: boolean; total?: number }
+
+export function BottomAction({ text, onClick, active = true, visible, total }: ActionProps) {
+  const withTotal = !!total
+  useMainButton({ text: withTotal && TG ? `${text} · ${rub(total)}` : text, onClick, active, visible })
   if (!visible) return null
   return (
     <div className="bottom-action">
+      {withTotal && (
+        <span className="ba-total">
+          <small>Итого</small>
+          <b>{rub(total)}</b>
+        </span>
+      )}
       <button className="btn" type="button" disabled={!active} onClick={onClick}>{text}</button>
     </div>
   )
