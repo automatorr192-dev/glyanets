@@ -13,9 +13,9 @@ export function Studio() {
       </figure>
 
       <Group head="Как добраться" i={1}>
-        <Cell icon={<MapPin size={19} weight="fill" />} title={STUDIO.address} sub={`м. ${STUDIO.metro}, 5 минут пешком`} chevron onClick={() => openLink(STUDIO.map)} />
-        <Cell icon={<Clock size={19} weight="fill" />} title="Ежедневно" value="9:00-21:00" />
-        <Cell icon={<Phone size={19} weight="fill" />} title="Позвонить" value={STUDIO.phone} href={`tel:${STUDIO.phone.replace(/[^\d+]/g, '')}`} />
+        <Cell icon={<MapPin size={19} />} title={STUDIO.address} sub={`м. ${STUDIO.metro}, 5 минут пешком`} chevron onClick={() => openLink(STUDIO.map)} />
+        <Cell icon={<Clock size={19} />} title="Ежедневно" value="9:00-21:00" />
+        <Cell icon={<Phone size={19} />} title="Позвонить" value={STUDIO.phone} href={`tel:${STUDIO.phone.replace(/[^\d+]/g, '')}`} />
       </Group>
 
       <Group head="Перед визитом" i={2}>
@@ -30,7 +30,7 @@ export function Studio() {
       </Group>
 
       <p className="fineprint inner">
-        Демо-проект для портфолио: студия, цены и записи вымышлены, данные хранятся только на этом устройстве.
+        Демо-проект для портфолио: студия, цены и записи вымышлены, данные хранятся только на этом устройстве. Фото на главной: Unsplash.
         <br />
         Дизайн и разработка: @automatorrr
       </p>

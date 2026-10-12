@@ -39,7 +39,7 @@ export function Detail({ booking, now, onCancel }: Props) {
               return (
                 <div key={i} className={state}>
                   <Cell
-                    icon={state === 'done' ? <Check size={14} weight="bold" /> : <span style={{ fontSize: 12, fontWeight: 700 }}>{i + 1}</span>}
+                    icon={state === 'done' ? <Check size={16} /> : <span style={{ fontSize: 12, fontWeight: 700 }}>{i + 1}</span>}
                     title={st.stage}
                     sub={st.service}
                     value={state === 'now' ? <span className="chip in_work">сейчас</span> : undefined}

@@ -38,7 +38,7 @@ export function Book({ draft, set, onNext, isTop }: Props) {
       </Group>
 
       {draft.services.length > 0 && (
-        <Group i={2} foot={q.bundle ? undefined : 'Полировка с керамикой вместе дешевле на 10%.'}>
+        <Group i={2} foot={!q.bundle && (draft.services.includes('polish') || draft.services.includes('ceramic')) ? 'Полировка с керамикой вместе дешевле на 10%.' : undefined}>
           <Cell title="Работа займёт" value={duration(q.hours)} />
           {q.discount > 0 && <Cell title="Скидка за комплекс" value={<span className="discount">−{rub(q.discount)}</span>} />}
         </Group>
@@ -49,6 +49,7 @@ export function Book({ draft, set, onNext, isTop }: Props) {
         active={draft.services.length > 0}
         text={draft.services.length ? 'Выбрать время' : 'Выберите услугу'}
         total={q.total}
+        was={q.discount ? q.subtotal : undefined}
         onClick={onNext}
       />
     </>

@@ -10,7 +10,7 @@ body {
   background: var(--bg);
   color: var(--label);
   font-family: var(--font);
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
@@ -158,7 +158,7 @@ button {
   .web-intro .wi-text {
     margin: 0;
     color: var(--label-2);
-    font-size: 15px;
+    font-size: 17px;
     line-height: 1.55;
   }
 
@@ -257,6 +257,7 @@ button {
 
 .navbar .small {
   grid-column: 2;
+  margin: 0;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 18px;
@@ -299,8 +300,8 @@ button {
   height: 34px;
   display: grid;
   place-items: center;
-  border: 1px solid var(--line-strong);
-  background: var(--material);
+  border-radius: 50%;
+  background: var(--cell-2);
   font-size: 14px;
   font-weight: 700;
 }
@@ -328,7 +329,7 @@ button {
 
 .group-foot {
   margin: 12px 0 0;
-  font-size: 12.5px;
+  font-size: 13.5px;
   color: var(--label-2);
   line-height: 1.55;
   text-wrap: pretty;
@@ -375,19 +376,19 @@ a.cell:active {
 
 .cell .title {
   display: block;
-  font-size: 15px;
+  font-size: 16px;
 }
 
 .cell .sub {
   display: block;
   margin-top: 3px;
-  font-size: 12.5px;
+  font-size: 13.5px;
   color: var(--label-2);
 }
 
 .cell .value {
   color: var(--label);
-  font-size: 15px;
+  font-size: 16px;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
@@ -438,6 +439,23 @@ a.cell:active {
   letter-spacing: .12em;
   text-transform: uppercase;
   color: var(--label-2);
+}
+
+.field label small {
+  margin-left: 6px;
+  font-size: 11px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--label-2-solid);
+}
+
+.field .error {
+  font-size: 13px;
+  color: var(--tint);
+}
+
+.field input[aria-invalid='true'] {
+  border-color: var(--tint);
 }
 
 .field input {

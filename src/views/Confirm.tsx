@@ -1,6 +1,7 @@
+import { ArrowCounterClockwise, CreditCard, Wrench } from '@phosphor-icons/react'
 import { BottomAction, Cell, Group, NavBar, Steps } from '../components/ui'
 import { CLASSES, quote, readyAt } from '../lib/data'
-import { hm, relDay, rub } from '../lib/format'
+import { hm, plural, relDay, rub } from '../lib/format'
 import { requestPhone, TG } from '../lib/tg'
 import { useHaptic } from '../hooks/useHaptic'
 import { startOf } from './Time'
@@ -32,8 +33,12 @@ export function Confirm({ draft, set, now, onSubmit, onEditTime, onEditServices,
   const q = quote(draft.services, draft.cls)
   const start = startOf(draft, now)
   const ready = readyAt(start, q.hours)
-  const phoneOk = draft.phone.replace(/\D/g, '').length === 11
-  const valid = draft.car.trim().length > 1 && phoneOk
+  const digits = draft.phone.replace(/\D/g, '').length
+  const phoneOk = digits === 11
+  const carOk = draft.car.trim().length > 1
+  const valid = carOk && phoneOk
+  const missing = [!carOk && 'машину', !phoneOk && 'телефон'].filter(Boolean).join(' и ')
+  const phoneError = digits > 1 && !phoneOk ? `Не хватает ${11 - digits} ${plural(11 - digits, 'цифры', 'цифр', 'цифр')}` : null
   const edit = (go: () => void) => (
     <button type="button" className="edit" onClick={() => { haptic.tap(); go() }}>
       Изменить
@@ -70,13 +75,15 @@ export function Confirm({ draft, set, now, onSubmit, onEditTime, onEditServices,
         </div>
       </Group>
 
-      <Group head="Автомобиль" i={2} foot="Номер нужен охране на въезде.">
+      <Group head="Автомобиль" i={2} foot="Номер охрана сверит на въезде; без него спросит на месте.">
         <div className="field">
           <label htmlFor="car">Машина</label>
           <input id="car" value={draft.car} onChange={e => set({ car: e.target.value })} placeholder="Марка и модель" autoComplete="off" />
         </div>
         <div className="field">
-          <label htmlFor="plate">Госномер</label>
+          <label htmlFor="plate">
+            Госномер <small>необязательно</small>
+          </label>
           <input id="plate" value={draft.plate} onChange={e => set({ plate: e.target.value.toUpperCase() })} placeholder="А 000 АА 777" autoComplete="off" />
         </div>
       </Group>
@@ -87,11 +94,13 @@ export function Confirm({ draft, set, now, onSubmit, onEditTime, onEditServices,
         foot={
           valid
             ? 'Нажимая «Записаться», вы соглашаетесь на обработку персональных данных для связи по этой записи.'
-            : 'Чтобы записаться, укажите автомобиль и телефон.'
+            : `Чтобы записаться, укажите ${missing}.`
         }
       >
         <div className="field">
-          <label htmlFor="name">Имя</label>
+          <label htmlFor="name">
+            Имя <small>необязательно</small>
+          </label>
           <input id="name" value={draft.name} onChange={e => set({ name: e.target.value })} placeholder="Как к вам обращаться" autoComplete="given-name" />
         </div>
         <div className="field">
@@ -104,7 +113,14 @@ export function Confirm({ draft, set, now, onSubmit, onEditTime, onEditServices,
             onChange={e => set({ phone: maskPhone(e.target.value) })}
             placeholder="+7 999 000-00-00"
             autoComplete="tel"
+            aria-invalid={!!phoneError}
+            aria-describedby={phoneError ? 'phone-error' : undefined}
           />
+          {phoneError && (
+            <span className="error" id="phone-error">
+              {phoneError}
+            </span>
+          )}
         </div>
         {TG && !phoneOk && (
           <button type="button" className="link-row" onClick={share}>
@@ -112,6 +128,21 @@ export function Confirm({ draft, set, now, onSubmit, onEditTime, onEditServices,
           </button>
         )}
       </Group>
+
+      <ul className="assure inner rise" style={{ ['--i' as string]: 4 }}>
+        <li>
+          <CreditCard size={18} aria-hidden="true" />
+          Оплата в студии после приёмки работы, предоплаты нет.
+        </li>
+        <li>
+          <Wrench size={18} aria-hidden="true" />
+          Если на приёмке найдём больше работы, согласуем цену до начала.
+        </li>
+        <li>
+          <ArrowCounterClockwise size={18} aria-hidden="true" />
+          Отменить запись можно во вкладке «Записи» в любой момент.
+        </li>
+      </ul>
 
       <BottomAction visible={isTop} active={valid} text="Записаться" total={q.total} onClick={onSubmit} />
     </>

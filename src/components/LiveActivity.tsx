@@ -14,7 +14,7 @@ export function LiveActivity({ booking, now, onOpen }: { booking: Booking; now: 
   const Tag = onOpen ? 'button' : 'div'
 
   return (
-    <Tag type={onOpen ? 'button' : undefined} className="live inner rise" onClick={onOpen} aria-label={`В работе: ${booking.car}, ${Math.round(p * 100)} процентов`}>
+    <Tag type={onOpen ? 'button' : undefined} className="live inner rise" onClick={onOpen} aria-label={`В работе: ${booking.car}. Сейчас ${stages[current].service.toLowerCase()}, ${stages[current].stage.toLowerCase()}. Готово ${relDay(ready, new Date(now))} в ${hm(ready)}`}>
       <div className="live-top">
         <div className="live-text">
           <span className="live-state">

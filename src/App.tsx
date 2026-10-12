@@ -37,9 +37,9 @@ type Route =
 type Entry = Route & { key: number }
 
 const TABS: { id: Tab; name: string; icon: ReactNode }[] = [
-  { id: 'home', name: 'Услуги', icon: <Sparkle size={22} weight="fill" /> },
-  { id: 'bookings', name: 'Записи', icon: <CalendarCheck size={22} weight="fill" /> },
-  { id: 'studio', name: 'Студия', icon: <Storefront size={22} weight="fill" /> },
+  { id: 'home', name: 'Услуги', icon: <Sparkle size={22} /> },
+  { id: 'bookings', name: 'Записи', icon: <CalendarCheck size={22} /> },
+  { id: 'studio', name: 'Студия', icon: <Storefront size={22} /> },
 ]
 
 let seq = 0
@@ -129,6 +129,13 @@ export default function App() {
   const submit = () => {
     const q = quote(draft.services, draft.cls)
     const start = startOf(draft)
+    if (start.getTime() < Date.now() + 36e5) {
+      haptic.error()
+      flash('Это время уже прошло, выберите другое')
+      set({ time: null })
+      popTo('time')
+      return
+    }
     const b: Booking = {
       id: `b${Date.now()}`,
       services: draft.services,
@@ -246,7 +253,7 @@ export default function App() {
 
       {!TG && canBack && (
         <button className="web-back" type="button" onClick={pop} aria-label="Назад">
-          <CaretLeft size={22} weight="bold" />
+          <CaretLeft size={22} />
           Назад
         </button>
       )}

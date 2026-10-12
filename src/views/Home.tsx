@@ -8,11 +8,11 @@ import { status, type Booking } from '../lib/store'
 import { userName } from '../lib/tg'
 
 export const ICON: Record<ServiceId, ReactNode> = {
-  wash: <Drop size={18} weight="fill" />,
-  polish: <Sparkle size={18} weight="fill" />,
-  ceramic: <ShieldCheck size={18} weight="fill" />,
-  interior: <Armchair size={18} weight="fill" />,
-  ppf: <Shield size={18} weight="fill" />,
+  wash: <Drop size={18} />,
+  polish: <Sparkle size={18} />,
+  ceramic: <ShieldCheck size={18} />,
+  interior: <Armchair size={18} />,
+  ppf: <Shield size={18} />,
 }
 
 type Props = {
@@ -34,12 +34,11 @@ export function Home({ bookings, now, cls, onClass, onBook, onOpen }: Props) {
   const hero = (
     <section className="hero">
       <figure className="hero-shot" aria-hidden="true">
-        <img src="./studio.webp" alt="" width="1200" height="750" decoding="async" fetchPriority="high" />
+        <img src="./hero-car.webp" alt="" width="1600" height="1000" decoding="async" fetchPriority="high" />
       </figure>
       <div className="hero-copy inner">
-        <p className="hero-kicker">Детейлинг у м. {STUDIO.metro}</p>
         <h1 className="hero-title">Глянец</h1>
-        <p className="hero-text">Мойка, полировка, керамика и плёнка. Запишитесь за минуту и следите за машиной, пока она у нас.</p>
+        <p className="hero-text">Детейлинг у м. {STUDIO.metro}: мойка, полировка, керамика и плёнка. Запишитесь за минуту и следите за машиной, пока она у нас.</p>
         <button className="btn hero-cta" type="button" onClick={() => onBook([])}>
           Записаться
         </button>
@@ -56,7 +55,7 @@ export function Home({ bookings, now, cls, onClass, onBook, onOpen }: Props) {
       {next && (
         <Group i={1}>
           <Cell
-            icon={<CalendarCheck size={18} weight="fill" />}
+            icon={<CalendarCheck size={18} />}
             title={`Ждём вас ${relDay(new Date(next.start), new Date(now))} в ${hm(new Date(next.start))}`}
             sub={inOrder(next.services).map(id => byId(id).name).join(', ')}
             chevron

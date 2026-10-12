@@ -25,7 +25,7 @@ export function NavBar({ title, large, sub, right, hero }: NavProps) {
   return (
     <>
       <header className={`navbar${compact ? ' compact' : ''}`}>
-        <span className="small" aria-hidden={tall && !compact}>{title}</span>
+        {tall ? <span className="small" aria-hidden={!compact}>{title}</span> : <h1 className="small">{title}</h1>}
         {right && <span className="right">{right}</span>}
       </header>
       {hero ? (
@@ -75,14 +75,14 @@ type CellProps = {
 export function Cell({ icon, title, sub, value, onClick, chevron, checked, href }: CellProps) {
   const inner = (
     <>
-      {checked !== undefined && <span className="check" aria-hidden="true">{checked && <Check size={13} weight="bold" />}</span>}
+      {checked !== undefined && <span className="check" aria-hidden="true">{checked && <Check size={16} />}</span>}
       {icon && <span className="tile" aria-hidden="true">{icon}</span>}
       <span className="body">
         <span className="title">{title}</span>
         {sub && <span className="sub">{sub}</span>}
       </span>
       {value !== undefined && <span className="value">{value}</span>}
-      {chevron && <CaretRight className="chev" size={14} weight="bold" aria-hidden="true" />}
+      {chevron && <CaretRight className="chev" size={16} aria-hidden="true" />}
     </>
   )
   const cls = `cell${icon ? ' has-icon' : ''}`
@@ -150,9 +150,9 @@ export function Steps({ at }: { at: number }) {
   )
 }
 
-type ActionProps = { text: string; onClick: () => void; active?: boolean; visible: boolean; total?: number }
+type ActionProps = { text: string; onClick: () => void; active?: boolean; visible: boolean; total?: number; was?: number }
 
-export function BottomAction({ text, onClick, active = true, visible, total }: ActionProps) {
+export function BottomAction({ text, onClick, active = true, visible, total, was }: ActionProps) {
   const withTotal = !!total
   useMainButton({ text: withTotal && TG ? `${text} · ${rub(total)}` : text, onClick, active, visible })
   if (!visible) return null
@@ -160,7 +160,7 @@ export function BottomAction({ text, onClick, active = true, visible, total }: A
     <div className="bottom-action">
       {withTotal && (
         <span className="ba-total">
-          <small>Итого</small>
+          <small>Итого {!!was && <s>{rub(was)}</s>}</small>
           <b>{rub(total)}</b>
         </span>
       )}

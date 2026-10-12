@@ -56,7 +56,7 @@ export function Bookings({ bookings, now, onOpen, onBook }: Props) {
                   </span>
                 </span>
                 <span className={`chip ${s}`}>{STATUS_RU[s]}</span>
-                <CaretRight className="chev" size={16} weight="bold" aria-hidden="true" />
+                <CaretRight className="chev" size={16} aria-hidden="true" />
               </button>
             )
           })}
@@ -64,7 +64,7 @@ export function Bookings({ bookings, now, onOpen, onBook }: Props) {
       ) : (
         <div className="empty inner rise" style={{ ['--i' as string]: 1 }}>
           <span className="tile">
-            <CalendarPlus size={30} weight="fill" />
+            <CalendarPlus size={30} />
           </span>
           <h2>{tab === 'next' ? 'Нет предстоящих записей' : 'История пуста'}</h2>
           <p>{tab === 'next' ? 'Выберите услугу и удобное время, это займёт минуту.' : 'Здесь появятся визиты, когда машина побывает у нас.'}</p>

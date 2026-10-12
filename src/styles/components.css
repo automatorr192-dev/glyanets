@@ -9,18 +9,18 @@
 .hero-shot {
   position: relative;
   margin: 0;
-  height: min(58vh, 430px);
+  aspect-ratio: 4 / 3;
   overflow: hidden;
-  background: var(--cell);
+  background: #000;
 }
 
 .hero-shot img {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: 100% 50%;
-  filter: grayscale(1) contrast(1.15) brightness(.82);
+  object-fit: contain;
+  object-position: 50% 35%;
+  filter: grayscale(1) contrast(1.08);
   animation: develop .9s var(--ease) both;
 }
 
@@ -28,7 +28,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 55%, transparent) 0%, transparent 26%, transparent 55%, var(--bg) 100%);
+  background: linear-gradient(180deg, transparent 0%, transparent 74%, var(--bg) 100%);
 }
 
 @keyframes develop {
@@ -38,24 +38,15 @@
 
 .hero-copy {
   position: relative;
-  margin-top: -138px;
+  margin-top: -64px;
   padding: 0 var(--gutter);
-}
-
-.hero-kicker {
-  margin: 0;
-  font-size: 11.5px;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: var(--label-2);
-  animation: rise .6s .1s var(--ease) both;
 }
 
 .hero-title {
   margin: 6px 0 0;
   color: var(--tint);
   font-family: var(--font-display);
-  font-size: clamp(56px, 21cqi, 92px);
+  font-size: clamp(52px, 20cqi, 92px);
   line-height: .9;
   font-weight: 900;
   letter-spacing: -.01em;
@@ -65,8 +56,8 @@
 
 .hero-text {
   margin: 16px 0 0;
-  max-width: 34ch;
-  font-size: 14px;
+  max-width: 32ch;
+  font-size: 16px;
   line-height: 1.55;
   color: var(--label-2);
   text-wrap: pretty;
@@ -107,7 +98,7 @@
 }
 
 .class small {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--label-2);
 }
 
@@ -123,6 +114,20 @@
 
 .class:active {
   transform: scale(.97);
+}
+
+@media (max-width: 350px) {
+  .classes {
+    gap: 6px;
+  }
+
+  .class {
+    padding: 10px 8px;
+  }
+
+  .class small {
+    font-size: 11px;
+  }
 }
 
 /* --- услуги ----------------------------------------------------------------------- */
@@ -154,16 +159,16 @@
 }
 
 .service-price {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--tint);
+  color: var(--label);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
 
 .service-sub {
   grid-column: 1 / -1;
-  font-size: 12.5px;
+  font-size: 13.5px;
   color: var(--label-2);
 }
 
@@ -196,7 +201,7 @@
 }
 
 .bundle-name {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 700;
 }
 
@@ -209,7 +214,7 @@
 
 .bundle-price s {
   font-size: 12.5px;
-  color: var(--label-2-solid);
+  color: var(--label-2);
 }
 
 .bundle-price b {
@@ -267,7 +272,34 @@
 }
 
 .visit span {
-  font-size: 13px;
+  font-size: 13.5px;
+  color: var(--label-2);
+}
+
+.assure {
+  display: grid;
+  gap: 10px;
+  margin: 26px 0 0;
+  padding: 16px;
+  list-style: none;
+  border: 1px solid var(--sep);
+}
+
+.assure li {
+  display: flex;
+  gap: 10px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.assure svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--label-2);
+}
+
+.ba-total s {
+  font-size: 12.5px;
   color: var(--label-2);
 }
 
@@ -371,7 +403,7 @@ button.live:active {
 }
 
 .live-step {
-  font-size: 12.5px;
+  font-size: 13.5px;
   color: var(--label-2);
   white-space: nowrap;
   overflow: hidden;
@@ -426,8 +458,8 @@ button.live:active {
 }
 
 .live-steps li.done {
-  border-color: var(--tint);
-  background: var(--tint);
+  border-color: var(--label-2);
+  background: var(--label-2);
 }
 
 .live-steps li.now {
@@ -491,7 +523,8 @@ button.live:active {
 }
 
 .day.weekend small {
-  color: var(--tint);
+  color: var(--label);
+  font-weight: 700;
 }
 
 .day[aria-pressed='true'] {
@@ -522,7 +555,7 @@ button.live:active {
   height: 52px;
   border: 1px solid var(--line-strong);
   background: transparent;
-  font-size: 15px;
+  font-size: 16px;
   font-variant-numeric: tabular-nums;
   transition: border-color .2s var(--snap), background-color .2s var(--snap), color .2s var(--snap), transform .15s var(--snap);
 }
@@ -644,9 +677,9 @@ button.live:active {
 }
 
 .timeline .done .tile {
-  border-color: var(--tint);
-  background: var(--tint);
-  color: var(--tint-ink);
+  border-color: var(--line-strong);
+  background: var(--cell-2);
+  color: var(--label);
 }
 
 .timeline .now .tile {
@@ -699,7 +732,8 @@ button.live:active {
   fill: none;
   stroke: var(--tint-ink);
   stroke-width: 6;
-  stroke-linecap: square;
+  stroke-linecap: round;
+  stroke-linejoin: round;
   stroke-dasharray: 60;
   stroke-dashoffset: 60;
   animation: done-draw .45s .25s var(--ease) forwards;
@@ -770,7 +804,6 @@ button.live:active {
 
 @media (prefers-reduced-motion: reduce) {
   .hero-shot img,
-  .hero-kicker,
   .hero-title,
   .hero-text,
   .hero-cta,
