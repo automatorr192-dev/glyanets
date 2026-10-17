@@ -181,3 +181,23 @@ async def test_handoff_reaches_the_admin(database, events):
     await ask(7, "Позовите человека", model, events)
 
     assert events.got == [("handoff", "Хочет поговорить с мастером")]
+
+
+async def test_repeated_yes_does_not_book_twice(database, events):
+    book = call(
+        "book",
+        services=["wash"],
+        car_class="sedan",
+        date="2026-10-21",
+        time="10:00",
+        car="Kia K5",
+        phone="+79990000000",
+    )
+    await ask(7, "Давайте на 10, телефон +79990000000", script(book, say("Записал.")), events)
+    again = script(book, say("Вы уже записаны."))
+
+    await ask(7, "Да", again, events)
+
+    assert len(await db.mine(7)) == 1
+    assert "already_booked" in tool_results(again)[0]
+    assert [kind for kind, _ in events.got] == ["booked"]
