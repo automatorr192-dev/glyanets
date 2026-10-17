@@ -26,9 +26,10 @@ type Props = {
   onEditTime: () => void
   onEditServices: () => void
   isTop: boolean
+  prepay: number
 }
 
-export function Confirm({ draft, set, now, onSubmit, onEditTime, onEditServices, isTop }: Props) {
+export function Confirm({ draft, set, now, onSubmit, onEditTime, onEditServices, isTop, prepay }: Props) {
   const haptic = useHaptic()
   const q = quote(draft.services, draft.cls)
   const start = startOf(draft, now)
@@ -132,7 +133,9 @@ export function Confirm({ draft, set, now, onSubmit, onEditTime, onEditServices,
       <ul className="assure inner rise" style={{ ['--i' as string]: 4 }}>
         <li>
           <CreditCard size={18} aria-hidden="true" />
-          Оплата в студии после приёмки работы, предоплаты нет.
+          {prepay > 0
+            ? `Предоплата ${prepay}% картой прямо в Telegram, остальное — в студии после приёмки.`
+            : 'Оплата в студии после приёмки работы, предоплаты нет.'}
         </li>
         <li>
           <Wrench size={18} aria-hidden="true" />

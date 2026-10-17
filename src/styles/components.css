@@ -541,6 +541,12 @@ button.live:active {
   opacity: .3;
 }
 
+.slots-wait {
+  padding: 16px 0 4px;
+  color: var(--label-2);
+  font-size: 15px;
+}
+
 .slots {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

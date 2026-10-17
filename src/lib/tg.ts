@@ -17,6 +17,7 @@ type Inset = { top: number; bottom: number; left: number; right: number }
 export type WebApp = {
   platform: string
   version: string
+  initData: string
   initDataUnsafe: { user?: { first_name?: string; last_name?: string; photo_url?: string } }
   safeAreaInset?: Inset
   contentSafeAreaInset?: Inset
@@ -33,6 +34,7 @@ export type WebApp = {
   showConfirm?(message: string, cb: (ok: boolean) => void): void
   requestContact?(cb: (ok: boolean, res?: { responseUnsafe?: { contact?: { phone_number?: string } } }) => void): void
   openLink(url: string): void
+  openInvoice?(url: string, cb: (status: 'paid' | 'cancelled' | 'failed' | 'pending') => void): void
   isVersionAtLeast(v: string): boolean
   disableVerticalSwipes?(): void
 }

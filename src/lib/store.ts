@@ -11,6 +11,8 @@ export type Booking = {
   total: number
   phone?: string
   cancelled?: boolean
+  status?: 'awaiting_payment' | 'confirmed' | 'cancelled'
+  prepay?: number
 }
 
 export type Status = 'upcoming' | 'in_work' | 'done' | 'cancelled'

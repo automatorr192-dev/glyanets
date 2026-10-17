@@ -1,3 +1,5 @@
+import catalog from '../../catalog.json'
+
 export type CarClass = 'sedan' | 'suv' | 'large'
 export type ServiceId = 'wash' | 'polish' | 'ceramic' | 'interior' | 'ppf'
 
@@ -10,61 +12,16 @@ export type Service = {
   includes: string[]
 }
 
-export const CLASSES: { id: CarClass; name: string }[] = [
-  { id: 'sedan', name: 'Седан' },
-  { id: 'suv', name: 'Кроссовер' },
-  { id: 'large', name: 'Внедорожник' },
-]
+export const CLASSES = catalog.classes as { id: CarClass; name: string }[]
 
-export const SERVICES: Service[] = [
-  {
-    id: 'wash',
-    name: 'Детейлинг-мойка',
-    short: 'Двухфазная мойка, сушка, чернение шин',
-    hours: 1.5,
-    price: { sedan: 2500, suv: 2900, large: 3400 },
-    includes: ['Бесконтактная и ручная фаза', 'Чистка дисков', 'Сушка воздухом', 'Чернение шин'],
-  },
-  {
-    id: 'polish',
-    name: 'Полировка кузова',
-    short: 'Убираем голограммы и мелкие царапины',
-    hours: 8,
-    price: { sedan: 18000, suv: 22000, large: 26000 },
-    includes: ['Замер толщины ЛКП', 'Абразивная полировка в два этапа', 'Обезжиривание'],
-  },
-  {
-    id: 'ceramic',
-    name: 'Керамика',
-    short: 'Два слоя, гарантия 2 года',
-    hours: 8,
-    price: { sedan: 28000, suv: 34000, large: 40000 },
-    includes: ['Подготовка поверхности', 'Два слоя состава', 'ИК-сушка', 'Контроль в боксе с освещением'],
-  },
-  {
-    id: 'interior',
-    name: 'Химчистка салона',
-    short: 'Сиденья, потолок, ковры, пластик',
-    hours: 6,
-    price: { sedan: 12000, suv: 14000, large: 16000 },
-    includes: ['Экстрактор на ткань', 'Кожа: очистка и пропитка', 'Озонирование'],
-  },
-  {
-    id: 'ppf',
-    name: 'Бронеплёнка',
-    short: 'Капот, бампер, фары, зеркала',
-    hours: 16,
-    price: { sedan: 45000, suv: 52000, large: 60000 },
-    includes: ['Полиуретан 190 мкм', 'Заворот кромок', 'Лекала под модель'],
-  },
-]
+export const SERVICES = catalog.services as Service[]
 
 export const byId = (id: ServiceId) => SERVICES.find(s => s.id === id)!
 
-const ORDER: ServiceId[] = ['wash', 'interior', 'polish', 'ppf', 'ceramic']
+const ORDER = catalog.order as ServiceId[]
 export const inOrder = (ids: ServiceId[]) => [...ids].sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b))
 
-export const BUNDLE_OFF = 0.1
+export const BUNDLE_OFF = catalog.bundle_off
 
 export function quote(ids: ServiceId[], cls: CarClass) {
   const items = inOrder(ids).map(id => ({ id, name: byId(id).name, price: byId(id).price[cls] }))
@@ -75,8 +32,8 @@ export function quote(ids: ServiceId[], cls: CarClass) {
   return { items, subtotal, discount, total: subtotal - discount, hours, bundle }
 }
 
-export const OPEN_HOUR = 9
-export const CLOSE_HOUR = 21
+export const OPEN_HOUR = catalog.open_hour
+export const CLOSE_HOUR = catalog.close_hour
 
 export function slotsFor(day: Date, hours: number, taken: string[], now = new Date()): { time: string; free: boolean }[] {
   const out: { time: string; free: boolean }[] = []

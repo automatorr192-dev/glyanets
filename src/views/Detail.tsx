@@ -6,9 +6,9 @@ import { dayMonth, hm, relDay, rub, weekday } from '../lib/format'
 import { progress, status, type Booking } from '../lib/store'
 import { STATUS_RU } from './Bookings'
 
-type Props = { booking: Booking; now: number; onCancel: () => void }
+type Props = { booking: Booking; now: number; onCancel: () => void; onMove: () => void }
 
-export function Detail({ booking, now, onCancel }: Props) {
+export function Detail({ booking, now, onCancel, onMove }: Props) {
   const s = status(booking, now)
   const start = new Date(booking.start), ready = new Date(booking.ready)
   const stages = stagesOf(booking)
@@ -66,9 +66,14 @@ export function Detail({ booking, now, onCancel }: Props) {
           Позвонить в студию
         </a>
         {s === 'upcoming' && (
-          <button className="btn danger" type="button" onClick={onCancel}>
-            Отменить запись
-          </button>
+          <>
+            <button className="btn plain" type="button" onClick={onMove}>
+              Перенести
+            </button>
+            <button className="btn danger" type="button" onClick={onCancel}>
+              Отменить запись
+            </button>
+          </>
         )}
       </div>
     </>

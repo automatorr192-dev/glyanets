@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Toast } from './components/ui'
 import { useBackButton } from './hooks/useBackButton'
 import { useHaptic } from './hooks/useHaptic'
+import { api, ApiError, clock, isoDay, LIVE, pay } from './lib/api'
 import { quote, readyAt, type CarClass, type ServiceId } from './lib/data'
 import { load, save, type Booking } from './lib/store'
 import { confirm, userName, TG } from './lib/tg'
@@ -13,7 +14,7 @@ import { Detail } from './views/Detail'
 import { Done } from './views/Done'
 import { Home } from './views/Home'
 import { Studio } from './views/Studio'
-import { startOf, Time } from './views/Time'
+import { dayAt, startOf, Time } from './views/Time'
 
 export type Draft = {
   services: ServiceId[]
@@ -24,6 +25,7 @@ export type Draft = {
   plate: string
   name: string
   phone: string
+  moving: string | null
 }
 
 type Tab = 'home' | 'bookings' | 'studio'
@@ -47,9 +49,9 @@ const entry = (r: Route): Entry => ({ ...r, key: ++seq })
 const PUSH_MS = 500
 
 function useNow(ms: number) {
-  const [now, setNow] = useState(Date.now())
+  const [now, setNow] = useState(clock())
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), ms)
+    const id = setInterval(() => setNow(clock()), ms)
     return () => clearInterval(id)
   }, [ms])
   return now
@@ -58,7 +60,9 @@ function useNow(ms: number) {
 export default function App() {
   const haptic = useHaptic()
   const now = useNow(20_000)
-  const [bookings, setBookings] = useState<Booking[]>(load)
+  const [bookings, setBookings] = useState<Booking[]>(() => (LIVE ? [] : load()))
+  const [prepay, setPrepay] = useState(0)
+  const [busy, setBusy] = useState(false)
   const [stack, setStack] = useState<Entry[]>([entry({ name: 'home' })])
   const [entering, setEntering] = useState<number | null>(null)
   const [ghost, setGhost] = useState<Entry | null>(null)
@@ -74,12 +78,27 @@ export default function App() {
     plate: '',
     name: userName() === 'Гость' ? '' : userName(),
     phone: '',
+    moving: null,
   })
 
   useEffect(() => {
-    if (last.current) save(bookings)
+    if (last.current && !LIVE) save(bookings)
     last.current = bookings
   }, [bookings])
+
+  useEffect(() => {
+    if (!LIVE) return
+    api.config().then(c => setPrepay(c.prepay_percent)).catch(() => {})
+    api
+      .bookings()
+      .then(list => {
+        setBookings(list)
+        // Кнопка «Перенести» из напоминания в боте открывает мини-апп сразу на этой записи.
+        const move = new URLSearchParams(location.search).get('move')
+        if (move && list.some(b => b.id === move)) push({ name: 'detail', id: move })
+      })
+      .catch(e => flash(e.message))
+  }, [])
 
   const set = useCallback((patch: Partial<Draft>) => setDraft(d => ({ ...d, ...patch })), [])
 
@@ -122,18 +141,61 @@ export default function App() {
   useBackButton(pop, canBack)
 
   const startBooking = (ids: ServiceId[] = []) => {
-    set({ services: ids, time: null })
+    set({ services: ids, time: null, moving: null })
     push({ name: 'book' })
+  }
+
+  const taken = (e: unknown) => {
+    haptic.error()
+    flash(e instanceof ApiError ? e.message : 'Нет связи со студией, попробуйте ещё раз')
+    if (e instanceof ApiError && e.status === 409) {
+      set({ time: null })
+      popTo('time')
+    }
+  }
+
+  const submitLive = async () => {
+    setBusy(true)
+    try {
+      const created = await api.book({
+        services: draft.services,
+        cls: draft.cls,
+        day: isoDay(dayAt(draft.day, clock())),
+        time: draft.time!,
+        car: draft.car.trim(),
+        plate: draft.plate.trim(),
+        name: draft.name.trim(),
+        phone: draft.phone,
+      })
+      setBookings(list => [...list, created])
+      if (created.invoice && !(await pay(created.invoice))) {
+        flash('Запись подтвердится после предоплаты, время держим 15 минут')
+      } else {
+        if (created.invoice) setBookings(list => list.map(b => (b.id === created.id ? { ...b, status: 'confirmed' } : b)))
+        haptic.success()
+      }
+      setDraft(d => ({ ...d, services: [], time: null, day: 0 }))
+      setGhost(null)
+      setStack([entry({ name: 'home' }), entry({ name: 'done', id: created.id })])
+    } catch (e) {
+      taken(e)
+    } finally {
+      setBusy(false)
+    }
   }
 
   const submit = () => {
     const q = quote(draft.services, draft.cls)
-    const start = startOf(draft)
-    if (start.getTime() < Date.now() + 36e5) {
+    const start = startOf(draft, clock())
+    if (start.getTime() < clock() + 36e5) {
       haptic.error()
       flash('Это время уже прошло, выберите другое')
       set({ time: null })
       popTo('time')
+      return
+    }
+    if (LIVE) {
+      if (!busy) submitLive()
       return
     }
     const b: Booking = {
@@ -156,10 +218,46 @@ export default function App() {
 
   const cancel = async (id: string) => {
     if (!(await confirm('Отменить запись? Время освободится для других.'))) return
-    setBookings(list => list.map(b => (b.id === id ? { ...b, cancelled: true } : b)))
+    if (LIVE) {
+      try {
+        const done = await api.cancel(id)
+        setBookings(list => list.map(b => (b.id === id ? done : b)))
+      } catch (e) {
+        taken(e)
+        return
+      }
+    } else {
+      setBookings(list => list.map(b => (b.id === id ? { ...b, cancelled: true } : b)))
+    }
     haptic.error()
     flash('Запись отменена')
     pop()
+  }
+
+  const startMove = (b: Booking) => {
+    set({ services: b.services, cls: b.cls, day: 0, time: null, moving: b.id })
+    push({ name: 'time' })
+  }
+
+  const finishMove = async () => {
+    const id = draft.moving!
+    const start = startOf(draft, clock())
+    try {
+      const moved = LIVE
+        ? await api.move(id, isoDay(dayAt(draft.day, clock())), draft.time!)
+        : (() => {
+            const b = find(id)!
+            const hours = quote(b.services, b.cls).hours
+            return { ...b, start: start.toISOString(), ready: readyAt(start, hours).toISOString() }
+          })()
+      setBookings(list => list.map(b => (b.id === id ? moved : b)))
+      haptic.success()
+      flash('Запись перенесена')
+      setDraft(d => ({ ...d, services: [], time: null, day: 0, moving: null }))
+      popTo('detail')
+    } catch (e) {
+      taken(e)
+    }
   }
 
   const find = (id: string) => bookings.find(b => b.id === id)
@@ -184,7 +282,16 @@ export default function App() {
       case 'book':
         return <Book draft={draft} set={set} isTop={isTop} onNext={() => push({ name: 'time' })} />
       case 'time':
-        return <Time draft={draft} set={set} bookings={bookings} now={now} isTop={isTop} onNext={() => push({ name: 'confirm' })} />
+        return (
+          <Time
+            draft={draft}
+            set={set}
+            bookings={bookings.filter(b => b.id !== draft.moving)}
+            now={now}
+            isTop={isTop}
+            onNext={() => (draft.moving ? finishMove() : push({ name: 'confirm' }))}
+          />
+        )
       case 'confirm':
         return (
           <Confirm
@@ -192,6 +299,7 @@ export default function App() {
             set={set}
             now={now}
             isTop={isTop}
+            prepay={prepay}
             onSubmit={submit}
             onEditTime={() => popTo('time')}
             onEditServices={() => popTo('book')}
@@ -203,7 +311,7 @@ export default function App() {
       }
       case 'detail': {
         const b = find(r.id)
-        return b ? <Detail booking={b} now={now} onCancel={() => cancel(b.id)} /> : null
+        return b ? <Detail booking={b} now={now} onCancel={() => cancel(b.id)} onMove={() => startMove(b)} /> : null
       }
     }
   }

@@ -1,0 +1,8 @@
+node_modules
+.venv
+dist
+.git
+data
+.env
+__pycache__
+design
