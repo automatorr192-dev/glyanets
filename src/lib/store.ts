@@ -13,6 +13,7 @@ export type Booking = {
   cancelled?: boolean
   status?: 'awaiting_payment' | 'confirmed' | 'cancelled'
   prepay?: number
+  invoice?: string | null
 }
 
 export type Status = 'upcoming' | 'in_work' | 'done' | 'cancelled'

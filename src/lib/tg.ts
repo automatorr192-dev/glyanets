@@ -34,7 +34,6 @@ export type WebApp = {
   showConfirm?(message: string, cb: (ok: boolean) => void): void
   requestContact?(cb: (ok: boolean, res?: { responseUnsafe?: { contact?: { phone_number?: string } } }) => void): void
   openLink(url: string): void
-  openInvoice?(url: string, cb: (status: 'paid' | 'cancelled' | 'failed' | 'pending') => void): void
   isVersionAtLeast(v: string): boolean
   disableVerticalSwipes?(): void
 }

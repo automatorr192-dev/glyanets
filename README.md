@@ -25,7 +25,9 @@
 - Каталог с ценой по кузову S / M / L, скидка 10% за комплекс «полировка + керамика».
 - Запись в три шага; свободное время на две недели вперёд по частям дня, по числу боксов.
 - Перенос и отмена — в мини-аппе и кнопками из напоминания.
-- Предоплата 20% через Telegram Payments (тестовая ЮKassa); неоплаченная бронь держит время
+- Предоплата 20% по СБП или картой через RollyPay — ссылка работает и в мини-аппе, и в чате
+  Telegram и MAX; запись подтверждает подписанное уведомление об оплате, а не возврат клиента
+  со страницы оплаты. Неоплаченная бронь держит время
   15 минут и освобождается сама.
 - Напоминание за 2 часа до визита — в тот мессенджер, где клиент записывался.
 - ИИ-администратор в чате бота: цены, свободное время, запись, «мои записи», отмена, позвать
@@ -113,7 +115,7 @@ python evals/run_eval.py
 
 Python 3.11 · FastAPI · SQLAlchemy 2.0 (async) · Alembic · Postgres / sqlite · aiogram 3 ·
 MAX Bot API · OpenRouter (tool calling) · Vite · React 19 · TypeScript · Telegram Mini Apps ·
-Telegram Payments · Docker · GitHub Actions
+RollyPay · Docker · GitHub Actions
 
 ## Запуск
 
@@ -127,7 +129,7 @@ npm run dev       # http://localhost:5173
 Всё вместе — сервер, мини-апп в живом режиме, боты и Postgres:
 
 ```bash
-cp .env.example .env    # BOT_TOKEN, ADMIN_CHAT_ID, OPENROUTER_API_KEY, по желанию PAYMENT_TOKEN и MAX_BOT_TOKEN
+cp .env.example .env    # BOT_TOKEN, ADMIN_CHAT_ID, OPENROUTER_API_KEY, по желанию ключи RollyPay и MAX_BOT_TOKEN
 docker compose up --build
 ```
 

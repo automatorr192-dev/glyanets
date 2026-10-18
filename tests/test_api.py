@@ -122,16 +122,16 @@ def test_move_and_cancel(api):
 
 def test_prepayment_returns_an_invoice_and_waits(api, monkeypatch):
     async def link(booking):
-        return f"https://t.me/$invoice{booking.id}"
+        return f"https://rollypay.io/pay/{booking.id}"
 
     monkeypatch.setattr(tg, "PREPAY_PERCENT", 20)
-    monkeypatch.setattr(tg, "invoice_link", link)
+    monkeypatch.setattr(tg, "pay_link", link)
 
     booking = api.post("/api/bookings", json=ORDER, headers=as_user(1)).json()
 
     assert booking["status"] == "awaiting_payment"
     assert booking["prepay"] == 10100
-    assert booking["invoice"] == f"https://t.me/$invoice{booking['id']}"
+    assert booking["invoice"] == f"https://rollypay.io/pay/{booking['id']}"
     assert api.events == []
     assert api.get("/api/config").json() == {"prepay_percent": 20}
 

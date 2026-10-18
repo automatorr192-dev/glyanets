@@ -134,7 +134,7 @@ export function Confirm({ draft, set, now, onSubmit, onEditTime, onEditServices,
         <li>
           <CreditCard size={18} aria-hidden="true" />
           {prepay > 0
-            ? `Предоплата ${prepay}% картой прямо в Telegram, остальное — в студии после приёмки.`
+            ? `Предоплата ${prepay}% по СБП или картой, остальное — в студии после приёмки.`
             : 'Оплата в студии после приёмки работы, предоплаты нет.'}
         </li>
         <li>

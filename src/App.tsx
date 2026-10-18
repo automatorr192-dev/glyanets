@@ -3,10 +3,10 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Toast } from './components/ui'
 import { useBackButton } from './hooks/useBackButton'
 import { useHaptic } from './hooks/useHaptic'
-import { api, ApiError, clock, isoDay, LIVE, pay } from './lib/api'
+import { api, ApiError, clock, isoDay, LIVE } from './lib/api'
 import { quote, readyAt, type CarClass, type ServiceId } from './lib/data'
 import { load, save, type Booking } from './lib/store'
-import { confirm, userName, TG } from './lib/tg'
+import { confirm, openLink, userName, TG } from './lib/tg'
 import { Book } from './views/Book'
 import { Bookings } from './views/Bookings'
 import { Confirm } from './views/Confirm'
@@ -98,6 +98,17 @@ export default function App() {
         if (move && list.some(b => b.id === move)) push({ name: 'detail', id: move })
       })
       .catch(e => flash(e.message))
+    // Оплата открывается во внешнем браузере. Вернулся в мини-апп — перечитываем записи:
+    // подтверждение предоплаты приходит на сервер от RollyPay, а не из браузера клиента.
+    const refresh = () => {
+      if (document.visibilityState !== 'visible') return
+      api
+        .bookings()
+        .then(fresh => setBookings(list => fresh.map(b => ({ ...b, invoice: list.find(o => o.id === b.id)?.invoice }))))
+        .catch(() => {})
+    }
+    document.addEventListener('visibilitychange', refresh)
+    return () => document.removeEventListener('visibilitychange', refresh)
   }, [])
 
   const set = useCallback((patch: Partial<Draft>) => setDraft(d => ({ ...d, ...patch })), [])
@@ -168,12 +179,8 @@ export default function App() {
         phone: draft.phone,
       })
       setBookings(list => [...list, created])
-      if (created.invoice && !(await pay(created.invoice))) {
-        flash('Запись подтвердится после предоплаты, время держим 15 минут')
-      } else {
-        if (created.invoice) setBookings(list => list.map(b => (b.id === created.id ? { ...b, status: 'confirmed' } : b)))
-        haptic.success()
-      }
+      if (created.invoice) openLink(created.invoice)
+      haptic.success()
       setDraft(d => ({ ...d, services: [], time: null, day: 0 }))
       setGhost(null)
       setStack([entry({ name: 'home' }), entry({ name: 'done', id: created.id })])

@@ -91,32 +91,6 @@ async def test_cancel_button_cancels_only_own_booking(database, admin):
     assert edit.calls and "отменена" in admin[-1]
 
 
-async def test_checkout_only_for_a_live_hold_of_the_payer(database):
-    hold = await booking(1, prepay_percent=20)
-    answer = Answer()
-
-    await tg.pre_checkout(
-        NS(invoice_payload=f"booking:{hold.id}", from_user=NS(id=2), answer=answer)
-    )
-    await tg.pre_checkout(
-        NS(invoice_payload=f"booking:{hold.id}", from_user=NS(id=1), answer=answer)
-    )
-
-    assert [kwargs["ok"] for _, kwargs in answer.calls] == [False, True]
-
-
-async def test_payment_confirms_the_booking(database, admin):
-    hold = await booking(1, prepay_percent=20)
-    reply = Answer()
-    message = NS(successful_payment=NS(invoice_payload=f"booking:{hold.id}"), answer=reply)
-
-    await tg.paid(message)
-
-    assert (await db.get(hold.id)).status == "confirmed"
-    assert "Предоплата получена" in reply.calls[0][0][0]
-    assert "Предоплата получена" in admin[-1]
-
-
 async def test_expired_hold_frees_the_time(database, monkeypatch):
     hold = await booking(1, prepay_percent=20)
     real = db.expire_holds

@@ -13,16 +13,15 @@ from aiogram.types import (
     CallbackQuery,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-    LabeledPrice,
     MenuButtonWebApp,
     Message,
-    PreCheckoutQuery,
     WebAppInfo,
 )
 from dotenv import load_dotenv
 
 import concierge
 import db
+import payments
 import schedule
 from schedule import MSK
 
@@ -31,9 +30,9 @@ load_dotenv()
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
 WEBAPP_URL = os.environ.get("WEBAPP_URL", "https://automatorr192-dev.github.io/glyanets/")
 ADMIN_CHAT_ID = int(os.environ.get("ADMIN_CHAT_ID") or 0)
-# Тестовый провайдер ЮKassa из @BotFather → Payments. Нет токена — записи без предоплаты.
-PAYMENT_TOKEN = os.environ.get("PAYMENT_TOKEN", "")
-PREPAY_PERCENT = int(os.environ.get("PREPAY_PERCENT") or 20) if PAYMENT_TOKEN else 0
+# Предоплата через RollyPay (payments.py). Нет ключей кассы — записи без предоплаты.
+PREPAY_PERCENT = int(os.environ.get("PREPAY_PERCENT") or 20) if payments.enabled() else 0
+PAID = "Предоплата получена, запись подтверждена."
 CHECK_EVERY = 60
 
 DESCRIPTION = (
@@ -93,17 +92,19 @@ async def on_event(kind: str, subject) -> None:
     await notify_admin(f"<b>{title} №{subject.id}</b>\n{who}\n{html.escape(describe(subject))}")
 
 
-async def invoice_link(booking) -> str | None:
-    if not PAYMENT_TOKEN or not booking.prepay:
+async def pay_link(booking) -> str | None:
+    if not payments.enabled() or not booking.prepay:
         return None
-    return await bot().create_invoice_link(
-        title="Предоплата · Глянец",
-        description=describe(booking)[:255],
-        payload=f"booking:{booking.id}",
-        provider_token=PAYMENT_TOKEN,
-        currency="RUB",
-        prices=[LabeledPrice(label="Предоплата", amount=booking.prepay * 100)],
+    return await payments.create(
+        booking.id, booking.prepay, f"Предоплата · Глянец · {describe(booking)}", WEBAPP_URL
     )
+
+
+async def tell(user_id: int, text: str) -> None:
+    try:
+        await bot().send_message(user_id, text)
+    except Exception:
+        logging.exception("клиенту не ушло")
 
 
 def reminder_keyboard(booking) -> InlineKeyboardMarkup:
@@ -172,26 +173,6 @@ async def cancel_from_reminder(query: CallbackQuery):
     await on_event("cancelled", booking)
 
 
-@dp.pre_checkout_query()
-async def pre_checkout(query: PreCheckoutQuery):
-    """Последняя проверка перед списанием: бронь ещё держится и принадлежит плательщику."""
-    booking_id = int(query.invoice_payload.split(":")[1])
-    booking = await db.get(booking_id, query.from_user.id)
-    ok = booking is not None and booking.status == "awaiting_payment"
-    await query.answer(
-        ok=ok, error_message=None if ok else "Бронь истекла — выберите время заново."
-    )
-
-
-@dp.message(F.successful_payment)
-async def paid(message: Message):
-    booking = await db.mark_paid(int(message.successful_payment.invoice_payload.split(":")[1]))
-    if booking is None:
-        return
-    await message.answer(f"Предоплата получена, запись подтверждена.\n{describe(booking)}")
-    await on_event("paid", booking)
-
-
 @dp.message(F.text)
 async def chat(message: Message):
     await bot().send_chat_action(message.chat.id, "typing")
@@ -201,7 +182,7 @@ async def chat(message: Message):
             message.text,
             source="bot",
             on_event=on_event,
-            pay_link=invoice_link if PAYMENT_TOKEN else None,
+            pay_link=pay_link if payments.enabled() else None,
             prepay_percent=PREPAY_PERCENT,
         )
     except Exception:

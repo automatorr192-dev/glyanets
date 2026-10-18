@@ -6,6 +6,7 @@
 """
 
 import asyncio
+import json
 import logging
 import os
 from contextlib import asynccontextmanager, suppress
@@ -17,7 +18,7 @@ load_dotenv()
 
 from alembic import command  # noqa: E402
 from alembic.config import Config  # noqa: E402
-from fastapi import Depends, FastAPI, Header, HTTPException, Query, status  # noqa: E402
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, status  # noqa: E402
 from fastapi.staticfiles import StaticFiles  # noqa: E402
 from pydantic import BaseModel, Field  # noqa: E402
 from sqlalchemy import text  # noqa: E402
@@ -25,6 +26,7 @@ from sqlalchemy import text  # noqa: E402
 import bot as tg  # noqa: E402
 import db  # noqa: E402
 import maxbot  # noqa: E402
+import payments  # noqa: E402
 import schedule  # noqa: E402
 import tgauth  # noqa: E402
 from schedule import BadOrder  # noqa: E402
@@ -158,9 +160,57 @@ async def create_booking(data: BookingIn, user: int = Depends(client)):
     except db.Taken as e:
         raise HTTPException(status.HTTP_409_CONFLICT, "Это время только что заняли") from e
     if booking.status == "awaiting_payment":
-        return shape(booking, await tg.invoice_link(booking))
+        try:
+            return shape(booking, await tg.pay_link(booking))
+        except payments.PaymentError as e:
+            # Без ссылки на оплату бронь бессмысленна: освобождаем время сразу, а не через 15 минут.
+            await db.cancel(booking.id)
+            logging.warning("оплата не создана: %s", e)
+            raise HTTPException(
+                status.HTTP_502_BAD_GATEWAY, "Не получилось открыть оплату, попробуйте ещё раз"
+            ) from e
     await tg.on_event("booked", booking)
     return shape(booking)
+
+
+@app.post("/api/payments/rollypay")
+async def rollypay_callback(request: Request):
+    """Уведомление RollyPay об оплате. Отвечаем 2xx на всё подписанное: иначе RollyPay будет
+    повторять уведомление час. Подтверждаем запись только после сверки подписи и суммы."""
+    body = await request.body()
+    try:
+        payments.verify(
+            body, request.headers.get("X-Timestamp"), request.headers.get("X-Signature")
+        )
+    except payments.BadSignature as e:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Подпись не сходится") from e
+    event = json.loads(body)
+    booking_id = payments.booking_of(event)
+    # Тестовая оплата подтверждает запись, только пока касса сама в тестовом режиме.
+    if event.get("event_type") != "payment.paid" or booking_id is None:
+        return {"ok": True}
+    if bool(event.get("test")) != payments.TEST:
+        return {"ok": True}
+    booking = await db.get(booking_id)
+    if booking is None or float(event.get("amount") or 0) != booking.prepay:
+        logging.warning("оплата не сходится с записью: %s", event.get("order_id"))
+        return {"ok": True}
+    paid = await db.mark_paid(booking_id)
+    if paid is None:
+        if booking.status == "cancelled":
+            await tg.on_event(
+                "handoff",
+                f"Оплата по брони №{booking_id} пришла после того, как бронь истекла: "
+                f"свяжитесь с клиентом {booking.phone}",
+            )
+        return {"ok": True}
+    await tg.on_event("paid", paid)
+    text = f"{tg.PAID}\n{tg.describe(paid)}"
+    if paid.user_id > 0:
+        await tg.tell(paid.user_id, text)
+    else:
+        await maxbot.tell(paid.user_id, text)
+    return {"ok": True}
 
 
 @app.patch("/api/bookings/{booking_id}")

@@ -15,6 +15,7 @@ import httpx
 import bot as tg
 import concierge
 import db
+import payments
 
 API = "https://platform-api2.max.ru"
 TOKEN = os.environ.get("MAX_BOT_TOKEN", "").strip()
@@ -81,7 +82,12 @@ async def handle(http, update: dict) -> None:
             return
         try:
             answer = await concierge.reply(
-                uid(sender["user_id"]), text, source="max", on_event=tg.on_event
+                uid(sender["user_id"]),
+                text,
+                source="max",
+                on_event=tg.on_event,
+                pay_link=tg.pay_link if payments.enabled() else None,
+                prepay_percent=tg.PREPAY_PERCENT,
             )
         except Exception:
             logging.exception("MAX: ИИ-администратор упал")
@@ -102,6 +108,11 @@ async def handle(http, update: dict) -> None:
         )
         if booking:
             await tg.on_event("cancelled", booking)
+
+
+async def tell(user_id: int, text: str) -> None:
+    async with client() as http:
+        await send(http, text, user_id=abs(user_id))
 
 
 async def remind(booking) -> bool:

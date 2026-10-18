@@ -63,8 +63,3 @@ export const api = {
 
 export const isoDay = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-
-export function pay(url: string): Promise<boolean> {
-  if (!TG?.openInvoice) return Promise.resolve(false)
-  return new Promise(resolve => TG!.openInvoice!(url, status => resolve(status === 'paid')))
-}
