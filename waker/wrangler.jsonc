@@ -1,0 +1,8 @@
+{
+  "name": "glyanets-waker",
+  "main": "index.ts",
+  "compatibility_date": "2026-09-01",
+  // 04:00–19:50 UTC — с 7 до 23 по Москве.
+  "triggers": { "crons": ["*/10 4-19 * * *"] },
+  "vars": { "SERVER_URL": "" }
+}

@@ -1,7 +1,0 @@
-{
-  "name": "glyanets-bot",
-  "main": "index.ts",
-  "compatibility_date": "2026-09-01",
-  "vars": { "WEBAPP_URL": "https://automatorr192-dev.github.io/glyanets/" },
-  "secrets": { "required": ["BOT_TOKEN", "WEBHOOK_SECRET"] }
-}

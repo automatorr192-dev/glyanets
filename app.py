@@ -6,9 +6,11 @@
 """
 
 import asyncio
+import hmac
 import json
 import logging
 import os
+from collections import deque
 from contextlib import asynccontextmanager, suppress
 from datetime import date
 
@@ -16,6 +18,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+from aiogram.types import Update  # noqa: E402
 from alembic import command  # noqa: E402
 from alembic.config import Config  # noqa: E402
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, status  # noqa: E402
@@ -35,6 +38,10 @@ logging.basicConfig(level=logging.INFO)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 DIST = os.path.join(HERE, "dist")
+# Заданы оба — бот на вебхуке: бесплатный Render усыпляет сервер без входящих запросов,
+# и будит его сам Telegram, когда клиент пишет. Без них — long polling.
+PUBLIC_URL = (os.environ.get("PUBLIC_URL") or os.environ.get("RENDER_EXTERNAL_URL", "")).rstrip("/")
+WEBHOOK_SECRET = os.environ.get("WEBHOOK_SECRET", "")
 
 
 def migrate() -> None:
@@ -53,11 +60,31 @@ async def _forever(job, name: str):
             await asyncio.sleep(5)
 
 
+def hooked() -> bool:
+    return bool(tg.BOT_TOKEN and WEBHOOK_SECRET and PUBLIC_URL)
+
+
+async def _hook() -> None:
+    try:
+        await tg.introduce()
+        # Без drop_pending_updates: сервер будит как раз то сообщение, что ждёт в очереди.
+        await tg.bot().set_webhook(
+            f"{PUBLIC_URL}/telegram",
+            secret_token=WEBHOOK_SECRET,
+            allowed_updates=tg.dp.resolve_used_update_types(),
+        )
+    except Exception:
+        # Telegram недоступен на старте — мини-апп и API записи всё равно должны жить.
+        logging.exception("вебхук не установлен")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await asyncio.to_thread(migrate)
     jobs = [asyncio.create_task(tg.ticker(maxbot.remind if maxbot.enabled() else None))]
-    if tg.BOT_TOKEN:
+    if hooked():
+        await _hook()
+    elif tg.BOT_TOKEN:
         jobs.append(asyncio.create_task(_forever(tg.main, "Telegram-бот")))
     if maxbot.enabled():
         jobs.append(asyncio.create_task(_forever(maxbot.run, "MAX-бот")))
@@ -237,6 +264,28 @@ async def cancel_booking(booking_id: int, user: int = Depends(client)):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Запись не найдена")
     await tg.on_event("cancelled", booking)
     return shape(booking)
+
+
+_handling: set[asyncio.Task] = set()
+_seen: deque[int] = deque(maxlen=1000)
+
+
+@app.post("/telegram")
+async def telegram_update(request: Request):
+    secret = request.headers.get("X-Telegram-Bot-Api-Secret-Token", "")
+    if not hooked() or not hmac.compare_digest(secret, WEBHOOK_SECRET):
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Forbidden")
+    update = Update.model_validate(await request.json(), context={"bot": tg.bot()})
+    # Пока бесплатный Render просыпается, Telegram может прислать то же обновление ещё раз.
+    if update.update_id in _seen:
+        return {"ok": True}
+    _seen.append(update.update_id)
+    # ИИ-администратор думает дольше, чем Telegram ждёт ответа на вебхук: отвечаем сразу,
+    # обрабатываем фоном. Ссылку на задачу держим, иначе её соберёт сборщик мусора.
+    task = asyncio.create_task(tg.dp.feed_update(tg.bot(), update))
+    _handling.add(task)
+    task.add_done_callback(_handling.discard)
+    return {"ok": True}
 
 
 class NoCacheStatic(StaticFiles):

@@ -28,7 +28,12 @@ from schedule import MSK
 load_dotenv()
 
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
-WEBAPP_URL = os.environ.get("WEBAPP_URL", "https://automatorr192-dev.github.io/glyanets/")
+# На Render мини-апп в живом режиме раздаёт этот же сервер, поэтому его адрес — адрес сервиса.
+WEBAPP_URL = (
+    os.environ.get("WEBAPP_URL")
+    or os.environ.get("RENDER_EXTERNAL_URL")
+    or "https://automatorr192-dev.github.io/glyanets/"
+)
 ADMIN_CHAT_ID = int(os.environ.get("ADMIN_CHAT_ID") or 0)
 # Предоплата через RollyPay (payments.py). Нет ключей кассы — записи без предоплаты.
 PREPAY_PERCENT = int(os.environ.get("PREPAY_PERCENT") or 20) if payments.enabled() else 0
@@ -191,14 +196,18 @@ async def chat(message: Message):
     await message.answer(answer)
 
 
-async def main():
+async def introduce() -> None:
     b = bot()
     await b.set_my_description(DESCRIPTION)
     await b.set_my_short_description(SHORT_DESCRIPTION)
     await b.set_chat_menu_button(
         menu_button=MenuButtonWebApp(text="Запись", web_app=WebAppInfo(url=WEBAPP_URL))
     )
-    await dp.start_polling(b)
+
+
+async def main():
+    await introduce()
+    await dp.start_polling(bot())
 
 
 if __name__ == "__main__":
